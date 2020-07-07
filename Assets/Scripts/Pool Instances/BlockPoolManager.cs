@@ -13,7 +13,6 @@ public class BlockPoolManager : PoolManager
 		}
 
 		Statics.Pools[(int)Statics.KnownPools.BLOCK] = Instance;
-		PrePool();
 	}
 
 }

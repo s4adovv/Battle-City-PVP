@@ -20,7 +20,6 @@ public class BlowPoolManager : PoolManager
 		}
 
 		Pools[(int)KnownPools.BLOW] = Instance;
-		PrePool();
 		selfTransform = transform;
 	}
 

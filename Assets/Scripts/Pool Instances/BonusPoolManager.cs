@@ -13,7 +13,6 @@ public class BonusPoolManager : PoolManager
 		}
 
 		Statics.Pools[(int)Statics.KnownPools.BONUS] = Instance;
-		PrePool();
 	}
 
 }

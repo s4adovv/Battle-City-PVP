@@ -13,7 +13,6 @@ public class TankPoolManager : PoolManager
 		}
 
 		Statics.Pools[(int)Statics.KnownPools.TANK] = Instance;
-		PrePool();
 	}
 
 }
