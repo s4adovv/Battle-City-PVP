@@ -37,6 +37,10 @@ public class PoolManager : MonoBehaviour
 	/// </summary>
 	private List<IEntity> pool = new List<IEntity>();
 
+	private void Awake() {
+		PrePool(prePoolCount, defaultPrefab, unsortedPoolParent);
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public ref GameObjectComponent EnsureObject() => ref EnsureObject(defaultPrefab);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public ref GameObjectComponent EnsureObject(Vector3 position) => ref EnsureObject(defaultPrefab, position);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public ref GameObjectComponent EnsureObject(Quaternion rotation) => ref EnsureObject(defaultPrefab, rotation);
@@ -160,7 +164,6 @@ public class PoolManager : MonoBehaviour
 		}
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void PrePool() => PrePool(prePoolCount, defaultPrefab, unsortedPoolParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void PrePool(int count) => PrePool(count, defaultPrefab, unsortedPoolParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void PrePool(int count, Transform parent) => PrePool(count, defaultPrefab, parent);
 

@@ -14,7 +14,6 @@ public class BulletPoolManager : PoolManager
 		}
 
 		Statics.Pools[(int)Statics.KnownPools.BULLET] = Instance;
-		PrePool();
 	}
 
 }
