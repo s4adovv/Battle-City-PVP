@@ -11,5 +11,6 @@ public struct GameObjectComponent : IComponent {
 	public IEntity SelfEntity;
 	public GameObject Self;
 	public Transform SelfTransform;
+	public bool InUsage;
 
 }

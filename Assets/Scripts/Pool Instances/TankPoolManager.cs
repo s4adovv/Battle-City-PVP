@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TankPoolManager : EntityPool
+public class TankPoolManager : PoolManager
 {
 
 	public static TankPoolManager Instance;
 
-	protected override void Awake() {
-		base.Awake();
+	private void Awake() {
 		if (Instance == null) {
 			Instance = this;
 		}

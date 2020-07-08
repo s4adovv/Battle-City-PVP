@@ -22,9 +22,6 @@ public unsafe class MapManager : MonoBehaviour
 	private static readonly Vector3 Block_Scale = new Vector3(BLOCK_SIZE, BLOCK_SIZE, 1);
 	private static readonly Vector3 Half_Block_Vector = new Vector3(HALF_BLOCK_STEP, -HALF_BLOCK_STEP);
 
-	private static readonly int New_Line_Length = Environment.NewLine.Length;
-	private static readonly char Char_To_Avoid = Environment.NewLine[0];
-
 	public static MapManager Instance;
 
 	private static Vector3 BufferVector = Vector3.zero;
@@ -60,8 +57,10 @@ public unsafe class MapManager : MonoBehaviour
 			Teams flagStack = Teams.TOP;
 			//
 
+			int newLineLength = Environment.NewLine.Length;
+			char charToAvoid = Environment.NewLine[0];
 			for (int i = 0, j = 0; i < MAP_HEIGHT; i++) {
-				while (*ptr != Char_To_Avoid && j < MAP_WIDTH) {
+				while (*ptr != charToAvoid && j < MAP_WIDTH) {
 					MapCodes tempCode = (MapCodes)(*ptr & 0b1111); // 0b1111 - This is a bit mask that allows you to convert digit chars to the real digits
 					switch (tempCode) {
 						case MapCodes.EMPTY:
@@ -70,7 +69,8 @@ public unsafe class MapManager : MonoBehaviour
 							break;
 						case MapCodes.FLAG:
 							if (i == 0 || (MapCodes)(*(ptr - Salted_Map_Width) & 0b1111) != MapCodes.FLAG) { // Check upper code to avoid duplication of Flag
-								CorrectBlockBehaviour(BlockPoolManager.Instance.EnsureObject(Get2x2BlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), BlockTypes.FLAG, flagStack++);
+								ref GameObjectComponent flagGameObjectComponent = ref BlockPoolManager.Instance.EnsureObject(Get2x2BlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform);
+								CorrectBlockBehaviour(ref flagGameObjectComponent, BlockTypes.FLAG, flagStack++);
 							}
 							ptr += 2; // Skip because of (2x2) block size
 							j += 2;
@@ -91,13 +91,14 @@ public unsafe class MapManager : MonoBehaviour
 							break;
 						default:
 							BlockTypes tempType = (BlockTypes)(tempCode - 1); // Minus one because of the empty block
-							CorrectBlockBehaviour(BlockPoolManager.Instance.EnsureObject(GetBlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), tempType, Teams.COUNT); // I set Teams.COUNT(It doesn't matter actually) because neither block has no team, except for flags
+							ref GameObjectComponent gameObjectComponent = ref BlockPoolManager.Instance.EnsureObject(GetBlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform);
+							CorrectBlockBehaviour(ref gameObjectComponent, tempType, Teams.COUNT); // I set Teams.COUNT(It doesn't matter actually) because neither block has no team, except for flags
 							ptr++;
 							j++;
 							break;
 					}
 				}
-				ptr += New_Line_Length; // Skip new line chars
+				ptr += newLineLength; // Skip new line chars
 				j = 0;
 			}
 		}
@@ -114,54 +115,54 @@ public unsafe class MapManager : MonoBehaviour
 		}
 	}
 
-	private void CorrectBlockBehaviour(IEntity blockEntity, BlockTypes blockType, Teams team) {
-		ref GameObjectComponent blockGameObjectComponent = ref blockEntity.GetComponent<GameObjectComponent>();
-		ref HealthComponent blockHealthComponent = ref NotHasGet<HealthComponent>(blockEntity);
-		if (blockGameObjectComponent.Self.tag != Block_Tags[(int)blockType]) {
-			HasRemove<TeamComponent>(blockEntity);
-			ref BlockComponent blockComponent = ref NotHasGet<BlockComponent>(blockEntity);
-			ref SpriteRendererComponent blockRendererComponent = ref NotHasGet<SpriteRendererComponent>(blockEntity);
-			ref ColliderComponent blockColliderComponent = ref NotHasGet<ColliderComponent>(blockEntity);
-			ref AnimatorComponent blockAnimatorComponent = ref NotHasGet<AnimatorComponent>(blockEntity);
-			if (blockRendererComponent.SelfRenderer == null) {
-				blockRendererComponent.SelfRenderer = blockGameObjectComponent.Self.GetComponent<SpriteRenderer>();
+	private void CorrectBlockBehaviour(ref GameObjectComponent gameObjectComponent, BlockTypes blockType, Teams team) {
+		if (gameObjectComponent.Self.tag != Block_Tags[(int)blockType]) {
+			NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity);
+			HasRemove<TeamComponent>(gameObjectComponent.SelfEntity);
+			ref BlockComponent blockComponent = ref NotHasGet<BlockComponent>(gameObjectComponent.SelfEntity);
+			ref SpriteRendererComponent rendererComponent = ref NotHasGet<SpriteRendererComponent>(gameObjectComponent.SelfEntity);
+			ref ColliderComponent colliderComponent = ref NotHasGet<ColliderComponent>(gameObjectComponent.SelfEntity);
+			ref AnimatorComponent animatorComponent = ref NotHasGet<AnimatorComponent>(gameObjectComponent.SelfEntity);
+			if (rendererComponent.SelfRenderer == null) {
+				rendererComponent.SelfRenderer = gameObjectComponent.Self.GetComponent<SpriteRenderer>();
 			}
-			if (blockColliderComponent.SelfCollider == null) {
-				blockColliderComponent.SelfCollider = blockGameObjectComponent.Self.GetComponent<Collider2D>();
+			if (colliderComponent.SelfCollider == null) {
+				colliderComponent.SelfCollider = gameObjectComponent.Self.GetComponent<Collider2D>();
 			}
-			if (blockAnimatorComponent.SelfAnimator == null) {
-				blockAnimatorComponent.SelfAnimator = blockGameObjectComponent.Self.GetComponent<Animator>();
+			if (animatorComponent.SelfAnimator == null) {
+				animatorComponent.SelfAnimator = gameObjectComponent.Self.GetComponent<Animator>();
 			}
 
-			blockAnimatorComponent.SelfAnimator.enabled = false;
-			blockColliderComponent.SelfCollider.enabled = true;
-			blockColliderComponent.SelfCollider.isTrigger = false;
-			blockGameObjectComponent.SelfTransform.localScale = Vector_Half;
-			blockRendererComponent.SelfRenderer.sortingLayerName = GRASS_LAYER_NAME;
+			animatorComponent.SelfAnimator.enabled = false;
+			colliderComponent.SelfCollider.enabled = true;
+			colliderComponent.SelfCollider.isTrigger = false;
+			gameObjectComponent.SelfTransform.localScale = Vector_Half;
+			rendererComponent.SelfRenderer.sortingLayerName = GRASS_LAYER_NAME;
 
 			blockComponent.BlockType = blockType;
-			blockGameObjectComponent.Self.tag = Block_Tags[(int)blockType];
-			blockRendererComponent.SelfRenderer.sprite = blockSprites[(int)blockType];
+			gameObjectComponent.Self.tag = Block_Tags[(int)blockType];
+			rendererComponent.SelfRenderer.sprite = blockSprites[(int)blockType];
 			switch (blockType) {
 				case BlockTypes.STEEL:
-					blockHealthComponent.Invulnerable = true;
+					ref HealthComponent tempHealthComponent = ref NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity);
+					tempHealthComponent.Invulnerable = true;
 					break;
 				case BlockTypes.WATER:
-					blockAnimatorComponent.SelfAnimator.enabled = true;
-					HasRemove<HealthComponent>(blockEntity);
+					animatorComponent.SelfAnimator.enabled = true;
+					HasRemove<HealthComponent>(gameObjectComponent.SelfEntity);
 					break;
 				case BlockTypes.LEAVES:
-					blockColliderComponent.SelfCollider.isTrigger = true;
-					blockRendererComponent.SelfRenderer.sortingLayerName = CLOUD_LAYER_NAME;
+					colliderComponent.SelfCollider.isTrigger = true;
+					rendererComponent.SelfRenderer.sortingLayerName = CLOUD_LAYER_NAME;
 					break;
 				case BlockTypes.GRAVEL:
-					blockColliderComponent.SelfCollider.enabled = false;
-					HasRemove<HealthComponent>(blockEntity);
+					colliderComponent.SelfCollider.enabled = false;
+					HasRemove<HealthComponent>(gameObjectComponent.SelfEntity);
 					break;
 				case BlockTypes.FLAG:
-					blockGameObjectComponent.SelfTransform.localScale = Vector_One;
-					ref TeamComponent flagTeamComponent = ref NotHasGet<TeamComponent>(blockEntity);
-					flagTeamComponent.Team = team;
+					gameObjectComponent.SelfTransform.localScale = Vector_One;
+					ref TeamComponent teamComponent = ref NotHasGet<TeamComponent>(gameObjectComponent.SelfEntity);
+					teamComponent.Team = team;
 					break;
 				default:
 					break;
@@ -169,16 +170,20 @@ public unsafe class MapManager : MonoBehaviour
 		}
 		switch (blockType) {
 			case BlockTypes.BRICK:
-				blockHealthComponent.Health = brickLives;
+				ref HealthComponent healthComponent = ref NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity); // I copy pasted it just so the health component won't be added to non health blocks(Gravel, Water)
+				healthComponent.Health = brickLives;
 				break;
 			case BlockTypes.STEEL:
-				blockHealthComponent.Health = steelLives;
+				healthComponent = ref NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity);
+				healthComponent.Health = steelLives;
 				break;
 			case BlockTypes.LEAVES:
-				blockHealthComponent.Health = leavesLives;
+				healthComponent = ref NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity);
+				healthComponent.Health = leavesLives;
 				break;
 			case BlockTypes.FLAG:
-				blockHealthComponent.Health = flagLives;
+				healthComponent = ref NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity);
+				healthComponent.Health = flagLives;
 				break;
 			default:
 				break;

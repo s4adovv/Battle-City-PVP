@@ -14,21 +14,21 @@ public sealed class BulletSystem : UpdateSystem {
 	public override void OnAwake() { }
 
 	public override void OnUpdate(float deltaTime) {
-		ref Filter.ComponentsBag<GameObjectComponent> bulletGameObjectBag = ref All_Bullets_Filter.Select<GameObjectComponent>();
+		ref Filter.ComponentsBag<GameObjectComponent> gameObjectBag = ref All_Bullets_Filter.Select<GameObjectComponent>();
 		ref Filter.ComponentsBag<BulletComponent> bulletBag = ref All_Bullets_Filter.Select<BulletComponent>();
 
 		for (int i = 0; i < All_Bullets_Filter.Length; i++) {
-			ref GameObjectComponent bulletGameObjectComponent = ref bulletGameObjectBag.GetComponent(i);
-			if (!bulletGameObjectComponent.Self.activeSelf)
+			ref GameObjectComponent gameObjectComponent = ref gameObjectBag.GetComponent(i);
+			if (!gameObjectComponent.Self.activeSelf)
 				continue;
 
 			ref BulletComponent bulletComponent = ref bulletBag.GetComponent(i);
 
-			Move(ref bulletGameObjectComponent, ref bulletComponent, deltaTime);
+			Move(ref gameObjectComponent, ref bulletComponent, deltaTime);
 		}
 	}
 
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] private void Move(ref GameObjectComponent bulletGameObjectComponent, ref BulletComponent bulletComponent, float deltaTime) => bulletGameObjectComponent.SelfTransform.transform.Translate(bulletComponent.Velocity * Vector_Up * deltaTime);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] private void Move(ref GameObjectComponent gameObjectComponent, ref BulletComponent bulletComponent, float deltaTime) => gameObjectComponent.SelfTransform.transform.Translate(bulletComponent.Velocity * Vector_Up * deltaTime);
 
 }
