@@ -90,6 +90,8 @@
     <Compile Include="Assets\ECS Scripts\Systems\BulletSystem.cs" />
     <Compile Include="Assets\ECS Scripts\Systems\PlayerSystem.cs" />
     <Compile Include="Assets\ECS Scripts\Systems\TankSystem.cs" />
+    <Compile Include="Assets\Scripts\EntityPool.cs" />
+    <Compile Include="Assets\Scripts\IPool.cs" />
     <Compile Include="Assets\Scripts\Managers\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Managers\MapManager.cs" />
     <Compile Include="Assets\Scripts\Managers\PlayManager.cs" />
@@ -103,7 +105,6 @@
     <Compile Include="Assets\Scripts\Pool Instances\BonusPoolManager.cs" />
     <Compile Include="Assets\Scripts\Pool Instances\BulletPoolManager.cs" />
     <Compile Include="Assets\Scripts\Pool Instances\TankPoolManager.cs" />
-    <Compile Include="Assets\Scripts\PoolManager.cs" />
     <Compile Include="Assets\Scripts\Statics.cs" />
     <None Include="Assets\ScriptTemplates\ECS__Globals__CustomVariable.cs.txt" />
     <None Include="Assets\ScriptTemplates\ECS__System.cs.txt" />
