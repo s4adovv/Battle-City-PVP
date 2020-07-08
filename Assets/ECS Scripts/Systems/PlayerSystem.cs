@@ -21,6 +21,7 @@ public sealed class PlayerSystem : UpdateSystem {
 		ref Filter.ComponentsBag<PlayerComponent> playerBag = ref Only_Players_Filter.Select<PlayerComponent>();
 		ref Filter.ComponentsBag<TeamComponent> teamBag = ref Only_Players_Filter.Select<TeamComponent>();
 		ref Filter.ComponentsBag<HealthComponent> healthBag = ref Only_Players_Filter.Select<HealthComponent>();
+		ref Filter.ComponentsBag<AnimatorComponent> tankAnimatorBag = ref All_Tanks_Filter.Select<AnimatorComponent>();
 
 		for (int i = 0; i < Only_Players_Filter.Length; i++) {
 			ref GameObjectComponent gameObjectComponent = ref gameObjectBag.GetComponent(i);
@@ -31,6 +32,7 @@ public sealed class PlayerSystem : UpdateSystem {
 			ref PlayerComponent playerComponent = ref playerBag.GetComponent(i);
 			ref TeamComponent teamComponent = ref teamBag.GetComponent(i);
 			ref HealthComponent healthComponent = ref healthBag.GetComponent(i);
+			ref AnimatorComponent tankWheelsAnimatorComponent = ref tankAnimatorBag.GetComponent(i);
 
 			if (teamComponent.Team != PlayManager.frozenTeam) {
 				int keysBuffer = 0;
@@ -49,7 +51,7 @@ public sealed class PlayerSystem : UpdateSystem {
 				}
 				TryFire(ref tankComponent, keysBuffer);
 				TryRotate(ref tankComponent, keysBuffer);
-				TryMove(ref tankComponent, keysBuffer);
+				TryMove(ref tankComponent, ref tankWheelsAnimatorComponent, keysBuffer);
 			}
 		}
 	}
@@ -87,15 +89,17 @@ public sealed class PlayerSystem : UpdateSystem {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] private void Rotate(ref TankComponent tankComponent, Directions direction) => tankComponent.TankDirection = direction;
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void TryMove(ref TankComponent tankComponent, int keysBuffer) {
+	private void TryMove(ref TankComponent tankComponent, ref AnimatorComponent tankAnimatorComponent, int keysBuffer) {
 		if ((keysBuffer & 0b1111) != 0) {
 			if (tankComponent.TankState != States.MOVING) {
 				Move(ref tankComponent, States.MOVING);
+				tankAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, true);
 				AudioManager.Instance.RequestInfiniteSound(GameSounds.MOVING);
 			}
 		} else {
 			if (tankComponent.TankState != States.IDLE) {
 				Move(ref tankComponent, States.IDLE);
+				tankAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, false);
 				AudioManager.Instance.RequestInfiniteSound(GameSounds.IDLE);
 			}
 		}

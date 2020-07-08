@@ -23,8 +23,6 @@ public class PlayManager : MonoBehaviour
 		}
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void GameOver(Teams wonTeam) => UIManager.Instance.GameOverCoroutine(wonTeam);
-
 	public void InitializeGame() {
 		frozenTeam = Teams.COUNT;
 		MapManager.Instance.CreateRandomMap();
@@ -38,10 +36,12 @@ public class PlayManager : MonoBehaviour
 		AudioManager.Instance.RequestSound(GameSounds.GAME_START);
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void GameOver(Teams wonTeam) => UIManager.Instance.GameOverCoroutine(wonTeam);
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SetPlayerInvulnerableCoroutine(IEntity playerEntity) => StartCoroutine("SetPlayerInvulnerableRoutine", playerEntity);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void SetPlayerInvulnerableHelper(ref HealthComponent healthComponent, ref PlayerComponent playerComponent, bool invulnerable) {
-		healthComponent.Invulnerable = invulnerable;
+	private void SetPlayerInvulnerableHelper(ref HealthComponent playerHealthComponent, ref PlayerComponent playerComponent, bool invulnerable) {
+		playerHealthComponent.Invulnerable = invulnerable;
 		playerComponent.Invulnerability.SetActive(invulnerable);
 	}
 	private IEnumerator SetPlayerInvulnerableRoutine(IEntity playerEntity) {
@@ -53,8 +53,8 @@ public class PlayManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SetPlayerShieldCoroutine(IEntity playerEntity) => StartCoroutine("SetPlayerShieldRoutine", playerEntity);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void SetPlayerShieldHelper(ref HealthComponent healthComponent, ref PlayerComponent playerComponent, bool invulnerable) {
-		healthComponent.Invulnerable = invulnerable;
+	private void SetPlayerShieldHelper(ref HealthComponent playerHealthComponent, ref PlayerComponent playerComponent, bool invulnerable) {
+		playerHealthComponent.Invulnerable = invulnerable;
 		playerComponent.Shield.SetActive(invulnerable);
 	}
 	private IEnumerator SetPlayerShieldRoutine(IEntity playerEntity) {
