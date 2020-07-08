@@ -84,15 +84,15 @@ public class SpawnManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void RespawnPlayer(Teams team) {
-		ref GameObjectComponent gameObjectComponent = ref TankPoolManager.Instance.EnsureObject(playerSpawnPoints[(int)team], tankPoolTransform);
-		CorrectData(ref gameObjectComponent, team, TankTypes.PLAYER, PLAYER_TAG);
-		SpawnPlayerCoroutine((gameObjectComponent.SelfEntity, team));
+		IEntity playerEntity = TankPoolManager.Instance.Get(playerSpawnPoints[(int)team], tankPoolTransform);
+		CorrectData(playerEntity, team, TankTypes.PLAYER, PLAYER_TAG);
+		SpawnPlayerCoroutine(playerEntity, team);
 	}
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void RespawnBot(BotSides botSide) {
-		ref GameObjectComponent gameObjectComponent = ref TankPoolManager.Instance.EnsureObject(botSpawnPoints[(int)botSide], tankPoolTransform);
-		CorrectData(ref gameObjectComponent, (botSide == BotSides.TOP_LEFT || botSide == BotSides.TOP_RIGHT ? Teams.TOP : Teams.BOTTOM), TankTypes.BOT, BOT_TAG);
-		SpawnBotCoroutine((gameObjectComponent.SelfEntity, botSide));
+		IEntity botEntity = TankPoolManager.Instance.Get(botSpawnPoints[(int)botSide], tankPoolTransform);
+		CorrectData(botEntity, (botSide == BotSides.TOP_LEFT || botSide == BotSides.TOP_RIGHT ? Teams.TOP : Teams.BOTTOM), TankTypes.BOT, BOT_TAG);
+		SpawnBotCoroutine(botEntity, botSide);
 
 		AudioManager.Instance.RequestSound(GameSounds.BOT_CREATED);
 	}
@@ -106,38 +106,39 @@ public class SpawnManager : MonoBehaviour
 		botSpawnPointObjects[(int)botSide].transform.position = botSpawnPoints[(int)botSide];
 	}
 
-	private void CorrectData(ref GameObjectComponent gameObjectComponent, Teams team, TankTypes tankType, string tankTag) {
-		ref SpriteRendererComponent rendererComponent = ref NotHasGet<SpriteRendererComponent>(gameObjectComponent.SelfEntity);
-		ref ColliderComponent colliderComponent = ref NotHasGet<ColliderComponent>(gameObjectComponent.SelfEntity);
-		ref AnimatorComponent animatorComponent = ref NotHasGet<AnimatorComponent>(gameObjectComponent.SelfEntity);
-		if (rendererComponent.SelfRenderer == null) {
-			rendererComponent.SelfRenderer = gameObjectComponent.Self.GetComponent<SpriteRenderer>();
+	private void CorrectData(IEntity tankEntity, Teams team, TankTypes tankType, string tankTag) {
+		ref GameObjectComponent tankGameObjectComponent = ref tankEntity.GetComponent<GameObjectComponent>();
+		ref SpriteRendererComponent tankRendererComponent = ref NotHasGet<SpriteRendererComponent>(tankEntity);
+		ref ColliderComponent tankColliderComponent = ref NotHasGet<ColliderComponent>(tankEntity);
+		ref AnimatorComponent tankAnimatorComponent = ref NotHasGet<AnimatorComponent>(tankEntity);
+		if (tankRendererComponent.SelfRenderer == null) {
+			tankRendererComponent.SelfRenderer = tankGameObjectComponent.Self.GetComponent<SpriteRenderer>();
 		}
-		if (colliderComponent.SelfCollider == null) {
-			colliderComponent.SelfCollider = gameObjectComponent.Self.GetComponent<Collider2D>();
+		if (tankColliderComponent.SelfCollider == null) {
+			tankColliderComponent.SelfCollider = tankGameObjectComponent.Self.GetComponent<Collider2D>();
 		}
-		if (animatorComponent.SelfAnimator == null) {
-			animatorComponent.SelfAnimator = gameObjectComponent.SelfTransform.GetChild(TANK_WHEELS_CHILD_ID).GetComponent<Animator>();
+		if (tankAnimatorComponent.SelfAnimator == null) {
+			tankAnimatorComponent.SelfAnimator = tankGameObjectComponent.SelfTransform.GetChild(TANK_WHEELS_CHILD_ID).GetComponent<Animator>();
 		}
-		ref HealthComponent healthComponent = ref NotHasGet<HealthComponent>(gameObjectComponent.SelfEntity);
-		ref TankComponent tankComponent = ref NotHasGet<TankComponent>(gameObjectComponent.SelfEntity);
-		ref TeamComponent teamComponent = ref NotHasGet<TeamComponent>(gameObjectComponent.SelfEntity);
+		ref HealthComponent tankHealthComponent = ref NotHasGet<HealthComponent>(tankEntity);
+		ref TankComponent tankComponent = ref NotHasGet<TankComponent>(tankEntity);
+		ref TeamComponent tankTeamComponent = ref NotHasGet<TeamComponent>(tankEntity);
 
 		// If this is an object with other presets, then set standard components
-		if (gameObjectComponent.Self.tag != tankTag) {
-			gameObjectComponent.Self.tag = tankTag;
+		if (tankGameObjectComponent.Self.tag != tankTag) {
+			tankGameObjectComponent.Self.tag = tankTag;
 
 			switch (tankType) {
 				case TankTypes.PLAYER:
-					HasRemove<BotComponent>(gameObjectComponent.SelfEntity);
-					ref PlayerComponent playerComponent = ref NotHasGet<PlayerComponent>(gameObjectComponent.SelfEntity);
-					playerComponent.Invulnerability = gameObjectComponent.SelfTransform.GetChild(PLAYER_INVULNERABILITY_CHILD_ID).gameObject;
-					playerComponent.Shield = gameObjectComponent.SelfTransform.GetChild(PLAYER_SHIELD_CHILD_ID).gameObject;
+					HasRemove<BotComponent>(tankEntity);
+					ref PlayerComponent playerComponent = ref NotHasGet<PlayerComponent>(tankEntity);
+					playerComponent.Invulnerability = tankGameObjectComponent.SelfTransform.GetChild(PLAYER_INVULNERABILITY_CHILD_ID).gameObject;
+					playerComponent.Shield = tankGameObjectComponent.SelfTransform.GetChild(PLAYER_SHIELD_CHILD_ID).gameObject;
 					playerComponent.ShieldRenderer = playerComponent.Shield.GetComponent<SpriteRenderer>();
 					break;
 				case TankTypes.BOT:
-					HasRemove<PlayerComponent>(gameObjectComponent.SelfEntity);
-					NotHasGet<BotComponent>(gameObjectComponent.SelfEntity);
+					HasRemove<PlayerComponent>(tankEntity);
+					NotHasGet<BotComponent>(tankEntity);
 					break;
 				default:
 					break;
@@ -146,15 +147,15 @@ public class SpawnManager : MonoBehaviour
 			tankComponent.TankLevel = TankLevels.FIRST;
 			tankComponent.FirePeriod = PlayManager.Instance.standardTankFirePeriod;
 			tankComponent.Velocity = PlayManager.Instance.standardTankVelocity;
-			teamComponent.Team = team;
+			tankTeamComponent.Team = team;
 
 			if (tankComponent.BulletStartPoint == null) {
-				tankComponent.BulletStartPoint = gameObjectComponent.SelfTransform.GetChild(BULLET_SPAWN_POINT_CHILD_ID);
+				tankComponent.BulletStartPoint = tankGameObjectComponent.SelfTransform.GetChild(BULLET_SPAWN_POINT_CHILD_ID);
 			}
 			if (tankComponent.TankParts == null) {
 				tankComponent.TankParts = new SpriteRenderer[(int)TankParts.COUNT];
 				for (int i = 0; i < tankComponent.TankParts.Length; i++) {
-					tankComponent.TankParts[i] = gameObjectComponent.SelfTransform.GetChild(i).GetComponent<SpriteRenderer>(); // This implies that the body parts will have child id from 0 to 5
+					tankComponent.TankParts[i] = tankGameObjectComponent.SelfTransform.GetChild(i).GetComponent<SpriteRenderer>(); // This implies that the body parts will have child id from 0 to 5
 				}
 			}
 		}
@@ -162,22 +163,22 @@ public class SpawnManager : MonoBehaviour
 		// Set default values
 		switch (tankType) {
 			case TankTypes.PLAYER:
-				healthComponent.Health = (int)standardPlayerLives;
-				UIManager.Instance.SetLife(teamComponent.Team, (int)standardPlayerLives);
-				ref PlayerComponent playerComponent = ref NotHasGet<PlayerComponent>(gameObjectComponent.SelfEntity);
+				tankComponent.TankState = States.IDLE;
+				tankHealthComponent.Health = (int)standardPlayerLives;
+				UIManager.Instance.SetLife(tankTeamComponent.Team, (int)standardPlayerLives);
+				ref PlayerComponent playerComponent = ref NotHasGet<PlayerComponent>(tankEntity);
 				SkinManager.Instance.SetPlayerSkin(ref tankComponent, ref playerComponent, SkinManager.playersSkin[(int)team]);
 				break;
 			case TankTypes.BOT:
+				tankComponent.TankState = States.MOVING;
 				tankComponent.TankLevel = (TankLevels)Random.Range(0, (int)TankLevels.COUNT);
-				healthComponent.Health = (int)tankComponent.TankLevel * (int)standardBotLives;
-				NotHasGet<BotComponent>(gameObjectComponent.SelfEntity);
+				tankHealthComponent.Health = (int)tankComponent.TankLevel * (int)standardBotLives;
 				SkinManager.Instance.SetBotSkin(ref tankComponent, SkinManager.botsSkin[(int)team]);
 				break;
 			default:
 				break;
 		}
 		tankComponent.TankDirection = team == Teams.TOP ? Directions.DOWN : Directions.UP;
-		tankComponent.TankState = States.IDLE;
 	}
 
 	/// <summary>
@@ -187,25 +188,30 @@ public class SpawnManager : MonoBehaviour
 		BufferVector.x = Random.Range(MapTopLeftCorner.x + 1f, MapBottomRightCorner.x - 1f);
 		BufferVector.y = Random.Range(MapTopLeftCorner.y - 1f, MapBottomRightCorner.y + 1f);
 		BonusTypes bonus = (BonusTypes)Random.Range(0, (int)BonusTypes.COUNT);
-		ref GameObjectComponent gameObjectComponent = ref BonusPoolManager.Instance.EnsureObject(BufferVector, spawnTransform);
-		ref BonusComponent bonusComponent = ref NotHasGet<BonusComponent>(gameObjectComponent.SelfEntity);
-		ref SpriteRendererComponent rendererComponent = ref NotHasGet<SpriteRendererComponent>(gameObjectComponent.SelfEntity);
-		if (rendererComponent.SelfRenderer == null) {
-			rendererComponent.SelfRenderer = gameObjectComponent.Self.GetComponent<SpriteRenderer>();
+		IEntity bonusEntity = BonusPoolManager.Instance.Get(BufferVector, spawnTransform);
+		ref GameObjectComponent bonusGameObjectComponent = ref bonusEntity.GetComponent<GameObjectComponent>();
+		ref BonusComponent bonusComponent = ref NotHasGet<BonusComponent>(bonusEntity);
+		ref SpriteRendererComponent bonusRendererComponent = ref NotHasGet<SpriteRendererComponent>(bonusEntity);
+		if (bonusRendererComponent.SelfRenderer == null) {
+			bonusRendererComponent.SelfRenderer = bonusGameObjectComponent.Self.GetComponent<SpriteRenderer>();
 		}
 		bonusComponent.Bonus = bonus;
-		rendererComponent.SelfRenderer.sprite = SkinManager.Instance.GetBonusSprite(bonus);
+		bonusRendererComponent.SelfRenderer.sprite = SkinManager.Instance.GetBonusSprite(bonus);
 
 		AudioManager.Instance.RequestSound(GameSounds.BONUS_CREATED);
-		HidingBonusCoroutine(gameObjectComponent.SelfEntity);
+		HidingBonusCoroutine(bonusEntity);
 	}
 
 	// Bot coroutines
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SpawnBotCoroutine((IEntity botEntity, BotSides botSide) data) => StartCoroutine("SpawnBotInitializationRoutine", (data.botEntity, data.botSide));
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SpawnBotCoroutine(IEntity botEntity, BotSides botSide) => StartCoroutine("SpawnBotInitializationRoutine", (botEntity, botSide));
 	private void FlipBotSpawns(IEntity botEntity, BotSides botSide, bool botState) {
-		ref GameObjectComponent gameObjectComponent = ref botEntity.GetComponent<GameObjectComponent>();
-		gameObjectComponent.Self.SetActive(botState);
+		ref GameObjectComponent botGameObjectComponent = ref botEntity.GetComponent<GameObjectComponent>();
+		botGameObjectComponent.Self.SetActive(botState);
 		botSpawnPointObjects[(int)botSide].SetActive(!botState);
+		if (botState) {
+			ref AnimatorComponent botAnimatorComponent = ref botEntity.GetComponent<AnimatorComponent>();
+			botAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, true);
+		}
 	}
 	private IEnumerator SpawnBotInitializationRoutine((IEntity botEntity, BotSides botSide) data) {
 		FlipBotSpawns(data.botEntity, data.botSide, false);
@@ -238,10 +244,10 @@ public class SpawnManager : MonoBehaviour
 
 	// Player coroutines
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SpawnPlayerCoroutine((IEntity playerEntity, Teams team) data) => StartCoroutine("SpawnPlayerInitializationRoutine", (data.playerEntity, data.team));
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SpawnPlayerCoroutine(IEntity playerEntity, Teams team) => StartCoroutine("SpawnPlayerInitializationRoutine", (playerEntity, team));
 	private void FlipPlayerSpawnsHelper(IEntity playerEntity, Teams player, bool playerState) {
-		ref GameObjectComponent gameObjectComponent = ref playerEntity.GetComponent<GameObjectComponent>();
-		gameObjectComponent.Self.SetActive(playerState);
+		ref GameObjectComponent playerGameObjectComponent = ref playerEntity.GetComponent<GameObjectComponent>();
+		playerGameObjectComponent.Self.SetActive(playerState);
 		playerSpawnPointObjects[(int)player].SetActive(!playerState);
 	}
 	private IEnumerator SpawnPlayerInitializationRoutine((IEntity playerEntity, Teams team) data) {
@@ -273,16 +279,16 @@ public class SpawnManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] private void HidingBonusCoroutine(IEntity bonusEntity) => StartCoroutine("BonusHidingRoutine", bonusEntity);
 	private IEnumerator BonusHidingRoutine(IEntity bonusEntity) {
-		SpriteRenderer renderer = bonusEntity.GetComponent<SpriteRendererComponent>().SelfRenderer;
+		SpriteRenderer bonusRenderer = bonusEntity.GetComponent<SpriteRendererComponent>().SelfRenderer;
 		float tempDuration = bonusHidingDuration;
 		while (tempDuration > BONUS_HIDING_BELOW_LIMIT) {
 			tempDuration *= bonusHidingScale;
 			yield return new WaitForSeconds(tempDuration);
-			renderer.enabled = false;
+			bonusRenderer.enabled = false;
 			yield return bonusBlinkWFS;
-			renderer.enabled = true;
+			bonusRenderer.enabled = true;
 		}
-		BonusPoolManager.Instance.DestroyObject(bonusEntity, true);
+		BonusPoolManager.Instance.Remove(bonusEntity);
 	}
 
 	//
