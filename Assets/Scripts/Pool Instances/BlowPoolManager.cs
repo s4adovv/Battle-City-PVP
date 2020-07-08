@@ -25,7 +25,7 @@ public class BlowPoolManager : EntityPool
 	}
 
 	public void RequestBlow(bool isSmall, Vector3 atPosition) {
-		IEntity blowEntity = EnsureObject(atPosition, selfTransform);
+		IEntity blowEntity = Get(atPosition, selfTransform);
 		ref GameObjectComponent blowGameObjectComponent = ref blowEntity.GetComponent<GameObjectComponent>();
 		ref AnimatorComponent blowAnimatorComponent = ref NotHasGet<AnimatorComponent>(blowEntity);
 		if (blowAnimatorComponent.SelfAnimator == null) {

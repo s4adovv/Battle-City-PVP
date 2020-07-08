@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{ECC74C87-803A-53DC-546A-B4C88D1D0774}</ProjectGuid>
+    <ProjectGuid>{C951CEE2-C89F-3D19-9E1E-DB2BEB7EC39B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Morpeh.Tests</AssemblyName>
@@ -66,16 +66,16 @@
     <Compile Include="Assets\Morpeh\Tests\Editor\WorldTests.cs" />
     <None Include="Assets\Morpeh\Tests\Editor\Morpeh.Tests.Editor.asmdef" />
     <Reference Include="UnityEngine.TestRunner">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.TestRunner">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.7f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -267,7 +267,7 @@
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.7f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -626,11 +626,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Morpeh.csproj">
-      <Project>{60555E62-2295-0261-086C-4855F2E07AE1}</Project>
+      <Project>{E66EBAEB-A435-757C-92AF-6DFF225D199D}</Project>
       <Name>Morpeh</Name>
     </ProjectReference>
     <ProjectReference Include="Morpeh.Tests.Runtime.csproj">
-      <Project>{52A47E35-1E97-41EC-2CA5-AADB66901501}</Project>
+      <Project>{07C5AB40-2E89-7B86-E93C-C2C5C4EF6E1F}</Project>
       <Name>Morpeh.Tests.Runtime</Name>
     </ProjectReference>
   </ItemGroup>

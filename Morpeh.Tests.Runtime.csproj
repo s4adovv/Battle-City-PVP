@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{52A47E35-1E97-41EC-2CA5-AADB66901501}</ProjectGuid>
+    <ProjectGuid>{07C5AB40-2E89-7B86-E93C-C2C5C4EF6E1F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Morpeh.Tests.Runtime</AssemblyName>
@@ -69,16 +69,16 @@
     <Compile Include="Assets\Morpeh\Tests\Runtime\WorldTests.cs" />
     <None Include="Assets\Morpeh\Tests\Runtime\Morpeh.Tests.Runtime.asmdef" />
     <Reference Include="UnityEngine.TestRunner">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.TestRunner">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.7f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -258,7 +258,7 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.7f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Tanks PVP/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
+      <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.7f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
@@ -608,7 +608,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Morpeh.csproj">
-      <Project>{60555E62-2295-0261-086C-4855F2E07AE1}</Project>
+      <Project>{E66EBAEB-A435-757C-92AF-6DFF225D199D}</Project>
       <Name>Morpeh</Name>
     </ProjectReference>
   </ItemGroup>

@@ -70,7 +70,7 @@ public unsafe class MapManager : MonoBehaviour
 							break;
 						case MapCodes.FLAG:
 							if (i == 0 || (MapCodes)(*(ptr - Salted_Map_Width) & 0b1111) != MapCodes.FLAG) { // Check upper code to avoid duplication of Flag
-								CorrectBlockBehaviour(BlockPoolManager.Instance.EnsureObject(Get2x2BlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), BlockTypes.FLAG, flagStack++);
+								CorrectBlockBehaviour(BlockPoolManager.Instance.Get(Get2x2BlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), BlockTypes.FLAG, flagStack++);
 							}
 							ptr += 2; // Skip because of (2x2) block size
 							j += 2;
@@ -91,7 +91,7 @@ public unsafe class MapManager : MonoBehaviour
 							break;
 						default:
 							BlockTypes tempType = (BlockTypes)(tempCode - 1); // Minus one because of the empty block
-							CorrectBlockBehaviour(BlockPoolManager.Instance.EnsureObject(GetBlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), tempType, Teams.COUNT); // I set Teams.COUNT(It doesn't matter actually) because neither block has no team, except for flags
+							CorrectBlockBehaviour(BlockPoolManager.Instance.Get(GetBlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), tempType, Teams.COUNT); // I set Teams.COUNT(It doesn't matter actually) because neither block has no team, except for flags
 							ptr++;
 							j++;
 							break;
