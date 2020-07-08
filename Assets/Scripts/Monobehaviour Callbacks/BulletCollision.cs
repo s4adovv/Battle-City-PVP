@@ -8,19 +8,19 @@ using static Statics;
 public class BulletCollision : MonoBehaviour
 {
 
-	private IEntity bulletEntity;
+	private IEntity selfEntity;
 
 	private void Start() {
-		bulletEntity = GetComponent<IEntityProvider>().Entity;
+		selfEntity = GetComponent<IEntityProvider>().Entity;
 	}
 
 	// Check if bullet hit something with Collider
 	private void OnCollisionEnter2D(Collision2D collision) {
 		TryDecreaseHealth(collision.collider.GetComponent<IEntityProvider>()?.Entity);
 
-		ref GameObjectComponent bulletGameObjectComponent = ref bulletEntity.GetComponent<GameObjectComponent>();
-		BlowPoolManager.Instance.RequestBlow(true, bulletGameObjectComponent.SelfTransform.position);
-		BulletPoolManager.Instance.DestroyObject(bulletGameObjectComponent.SelfEntity);
+		ref GameObjectComponent gameObjectComponent = ref selfEntity.GetComponent<GameObjectComponent>();
+		BlowPoolManager.Instance.RequestBlow(true, gameObjectComponent.SelfTransform.position);
+		BulletPoolManager.Instance.DestroyObject(gameObjectComponent.SelfEntity, true);
 	}
 
 	// Check if the bullet hit something with Trigger(Leaves)
@@ -34,60 +34,60 @@ public class BulletCollision : MonoBehaviour
 
 		// Check if the bullet hit something with Health
 		if (hitEntity.Has<HealthComponent>()) {
-			ref BulletComponent bulletComponent = ref bulletEntity.GetComponent<BulletComponent>();
-			ref HealthComponent hitHealthComponent = ref hitEntity.GetComponent<HealthComponent>();
-			ref GameObjectComponent hitGameObjectComponent = ref hitEntity.GetComponent<GameObjectComponent>();
-			if (!hitHealthComponent.Invulnerable || (bulletComponent.CanDestroySteel && hitGameObjectComponent.Self.tag == Block_Tags[(int)BlockTypes.STEEL])) {
-				ref TeamComponent bulletTeamComponent = ref bulletEntity.GetComponent<TeamComponent>();
+			ref BulletComponent bulletComponent = ref selfEntity.GetComponent<BulletComponent>();
+			ref HealthComponent healthComponent = ref hitEntity.GetComponent<HealthComponent>();
+			ref GameObjectComponent gameObjectComponent = ref hitEntity.GetComponent<GameObjectComponent>();
+			if (!healthComponent.Invulnerable || (bulletComponent.CanDestroySteel && gameObjectComponent.Self.tag == Block_Tags[(int)BlockTypes.STEEL])) {
+				ref TeamComponent selfTeamComponent = ref selfEntity.GetComponent<TeamComponent>();
 
 				// Check if the bullet hit the tank or flag
 				if (hitEntity.Has<TeamComponent>()) {
 					ref TeamComponent hitTeamComponent = ref hitEntity.GetComponent<TeamComponent>();
-					if (bulletTeamComponent.Team != hitTeamComponent.Team) {
-						hitHealthComponent.Health--;
+					if (selfTeamComponent.Team != hitTeamComponent.Team) {
+						healthComponent.Health--;
 
-						if (hitGameObjectComponent.Self.tag == PLAYER_TAG) { // Check if the bullet hit player
-							UIManager.Instance.SetLife(hitTeamComponent.Team, hitHealthComponent.Health);
+						if (gameObjectComponent.Self.tag == PLAYER_TAG) { // Check if the bullet hit player
+							UIManager.Instance.SetLife(hitTeamComponent.Team, healthComponent.Health);
 						}
 					}
 				} else {
-					hitHealthComponent.Health--;
+					healthComponent.Health--;
 				}
 
-				TryToDestroy(ref hitGameObjectComponent, ref hitHealthComponent);
-			} else if (hitHealthComponent.Invulnerable && hitEntity.Has<PlayerComponent>()) {
+				TryToDestroy(ref gameObjectComponent, ref healthComponent);
+			} else if (healthComponent.Invulnerable && hitEntity.Has<PlayerComponent>()) {
 				AudioManager.Instance.RequestSound(GameSounds.SHIELD_HIT);
 			}
 		}
 	}
 
-	private void TryToDestroy(ref GameObjectComponent hitGameObjectComponent, ref HealthComponent hitHealthComponent) {
+	private void TryToDestroy(ref GameObjectComponent gameObjectComponent, ref HealthComponent healthComponent) {
 		const string BRICK_TAG = "Brick block";
 		const string STEEL_TAG = "Steel block";
 		const int KILL_TANK_SCORE = 1000;
 		const int KILL_FLAG_SCORE = 10000;
 
-		ref TeamComponent bulletTeamComponent = ref bulletEntity.GetComponent<TeamComponent>();
-		if (hitHealthComponent.Health <= 0) {
-			switch (hitGameObjectComponent.Self.tag) {
+		ref TeamComponent selfTeamComponent = ref selfEntity.GetComponent<TeamComponent>();
+		if (healthComponent.Health <= 0) {
+			switch (gameObjectComponent.Self.tag) {
 				case PLAYER_TAG:
-					ref TeamComponent hitTeamComponent = ref hitGameObjectComponent.SelfEntity.GetComponent<TeamComponent>();
+					ref TeamComponent hitTeamComponent = ref gameObjectComponent.SelfEntity.GetComponent<TeamComponent>();
 					SpawnManager.Instance.RespawnPlayer(hitTeamComponent.Team);
-					BlowPoolManager.Instance.RequestBlow(false, hitGameObjectComponent.SelfTransform.position);
+					BlowPoolManager.Instance.RequestBlow(false, gameObjectComponent.SelfTransform.position);
 					AudioManager.Instance.RequestSound(GameSounds.PLAYER_EXPLOSION);
 
-					UIManager.Instance.AddScoreCoroutine(KILL_TANK_SCORE, bulletTeamComponent.Team);
+					UIManager.Instance.AddScoreCoroutine(KILL_TANK_SCORE, selfTeamComponent.Team);
 					break;
 				case BOT_TAG:
-					BlowPoolManager.Instance.RequestBlow(false, hitGameObjectComponent.SelfTransform.position);
+					BlowPoolManager.Instance.RequestBlow(false, gameObjectComponent.SelfTransform.position);
 					AudioManager.Instance.RequestSound(GameSounds.BOT_EXPLOSION);
 
-					UIManager.Instance.AddScoreCoroutine(KILL_TANK_SCORE, bulletTeamComponent.Team);
+					UIManager.Instance.AddScoreCoroutine(KILL_TANK_SCORE, selfTeamComponent.Team);
 					break;
 				case FLAG_TAG:
-					hitTeamComponent = ref hitGameObjectComponent.SelfEntity.GetComponent<TeamComponent>();
-					PlayManager.playersScore[(int)bulletTeamComponent.Team] += KILL_FLAG_SCORE;
-					UIManager.Instance.SetScore(bulletTeamComponent.Team, PlayManager.playersScore[(int)bulletTeamComponent.Team]);
+					hitTeamComponent = ref gameObjectComponent.SelfEntity.GetComponent<TeamComponent>();
+					PlayManager.playersScore[(int)selfTeamComponent.Team] += KILL_FLAG_SCORE;
+					UIManager.Instance.SetScore(selfTeamComponent.Team, PlayManager.playersScore[(int)selfTeamComponent.Team]);
 
 					PlayManager.Instance.GameOver(hitTeamComponent.Team == Teams.TOP ? Teams.BOTTOM : Teams.TOP);
 					break;
@@ -101,7 +101,7 @@ public class BulletCollision : MonoBehaviour
 					break;
 			}
 
-			Pools[(int)hitHealthComponent.PoolOwner].DestroyObject(hitGameObjectComponent.SelfEntity);
+			Pools[(int)healthComponent.PoolOwner].DestroyObject(gameObjectComponent.SelfEntity, true);
 		}
 	}
 

@@ -45,35 +45,35 @@ public class SkinManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public Sprite GetBonusSprite(BonusTypes bonusType) => bonusSprites[(int)bonusType];
 
-	public void SetPlayerSkin(ref TankComponent playerTankComponent, ref PlayerComponent playerComponent, PlayerColors color) {
-		playerTankComponent.TankParts[(int)TankParts.BODY].sprite = playerBodySprites[(int)playerTankComponent.TankLevel];
-		playerTankComponent.TankParts[(int)TankParts.LIGHT].sprite = playerLightSprites[(int)playerTankComponent.TankLevel];
-		playerTankComponent.TankParts[(int)TankParts.SHADOW].sprite = playerShadowSprites[(int)playerTankComponent.TankLevel];
-		playerTankComponent.TankParts[(int)TankParts.WHEEL_BODY].sprite = playerWheelBodySprites[(int)playerTankComponent.TankLevel];
-		playerTankComponent.TankParts[(int)TankParts.WHEEL_LIGHT].sprite = playerWheelLightSprites[(int)playerTankComponent.TankLevel];
-		playerTankComponent.TankParts[(int)TankParts.WHEEL_SHADOW].sprite = playerWheelShadowSprites[(int)playerTankComponent.TankLevel];
-		playerTankComponent.TankParts[(int)TankParts.BODY].color = playerBodyColors[(int)color];
-		playerTankComponent.TankParts[(int)TankParts.LIGHT].color = playerLightColors[(int)color];
-		playerTankComponent.TankParts[(int)TankParts.SHADOW].color = playerShadowColors[(int)color];
-		playerTankComponent.TankParts[(int)TankParts.WHEEL_BODY].color = playerBodyColors[(int)color];
-		playerTankComponent.TankParts[(int)TankParts.WHEEL_LIGHT].color = playerLightColors[(int)color];
-		playerTankComponent.TankParts[(int)TankParts.WHEEL_SHADOW].color = playerShadowColors[(int)color];
+	public void SetPlayerSkin(ref TankComponent tankComponent, ref PlayerComponent playerComponent, PlayerColors color) {
+		tankComponent.TankParts[(int)TankParts.BODY].sprite = playerBodySprites[(int)tankComponent.TankLevel];
+		tankComponent.TankParts[(int)TankParts.LIGHT].sprite = playerLightSprites[(int)tankComponent.TankLevel];
+		tankComponent.TankParts[(int)TankParts.SHADOW].sprite = playerShadowSprites[(int)tankComponent.TankLevel];
+		tankComponent.TankParts[(int)TankParts.WHEEL_BODY].sprite = playerWheelBodySprites[(int)tankComponent.TankLevel];
+		tankComponent.TankParts[(int)TankParts.WHEEL_LIGHT].sprite = playerWheelLightSprites[(int)tankComponent.TankLevel];
+		tankComponent.TankParts[(int)TankParts.WHEEL_SHADOW].sprite = playerWheelShadowSprites[(int)tankComponent.TankLevel];
+		tankComponent.TankParts[(int)TankParts.BODY].color = playerBodyColors[(int)color];
+		tankComponent.TankParts[(int)TankParts.LIGHT].color = playerLightColors[(int)color];
+		tankComponent.TankParts[(int)TankParts.SHADOW].color = playerShadowColors[(int)color];
+		tankComponent.TankParts[(int)TankParts.WHEEL_BODY].color = playerBodyColors[(int)color];
+		tankComponent.TankParts[(int)TankParts.WHEEL_LIGHT].color = playerLightColors[(int)color];
+		tankComponent.TankParts[(int)TankParts.WHEEL_SHADOW].color = playerShadowColors[(int)color];
 		playerComponent.ShieldRenderer.color = playerBodyColors[(int)color];
 	}
 
-	public void SetBotSkin(ref TankComponent botTankComponent, BotColors color) {
-		botTankComponent.TankParts[(int)TankParts.BODY].sprite = botBodySprites[(int)botTankComponent.TankLevel];
-		botTankComponent.TankParts[(int)TankParts.LIGHT].sprite = botLightSprites[(int)botTankComponent.TankLevel];
-		botTankComponent.TankParts[(int)TankParts.SHADOW].sprite = botShadowSprites[(int)botTankComponent.TankLevel];
-		botTankComponent.TankParts[(int)TankParts.WHEEL_BODY].sprite = botWheelBodySprites[(int)botTankComponent.TankLevel];
-		botTankComponent.TankParts[(int)TankParts.WHEEL_LIGHT].sprite = botWheelLightSprites[(int)botTankComponent.TankLevel];
-		botTankComponent.TankParts[(int)TankParts.WHEEL_SHADOW].sprite = botWheelShadowSprites[(int)botTankComponent.TankLevel];
-		botTankComponent.TankParts[(int)TankParts.BODY].color = botBodyColors[(int)color];
-		botTankComponent.TankParts[(int)TankParts.LIGHT].color = botLightColors[(int)color];
-		botTankComponent.TankParts[(int)TankParts.SHADOW].color = botShadowColors[(int)color];
-		botTankComponent.TankParts[(int)TankParts.WHEEL_BODY].color = botBodyColors[(int)color];
-		botTankComponent.TankParts[(int)TankParts.WHEEL_LIGHT].color = botLightColors[(int)color];
-		botTankComponent.TankParts[(int)TankParts.WHEEL_SHADOW].color = botShadowColors[(int)color];
+	public void SetBotSkin(ref TankComponent tank, BotColors color) {
+		tank.TankParts[(int)TankParts.BODY].sprite = botBodySprites[(int)tank.TankLevel];
+		tank.TankParts[(int)TankParts.LIGHT].sprite = botLightSprites[(int)tank.TankLevel];
+		tank.TankParts[(int)TankParts.SHADOW].sprite = botShadowSprites[(int)tank.TankLevel];
+		tank.TankParts[(int)TankParts.WHEEL_BODY].sprite = botWheelBodySprites[(int)tank.TankLevel];
+		tank.TankParts[(int)TankParts.WHEEL_LIGHT].sprite = botWheelLightSprites[(int)tank.TankLevel];
+		tank.TankParts[(int)TankParts.WHEEL_SHADOW].sprite = botWheelShadowSprites[(int)tank.TankLevel];
+		tank.TankParts[(int)TankParts.BODY].color = botBodyColors[(int)color];
+		tank.TankParts[(int)TankParts.LIGHT].color = botLightColors[(int)color];
+		tank.TankParts[(int)TankParts.SHADOW].color = botShadowColors[(int)color];
+		tank.TankParts[(int)TankParts.WHEEL_BODY].color = botBodyColors[(int)color];
+		tank.TankParts[(int)TankParts.WHEEL_LIGHT].color = botLightColors[(int)color];
+		tank.TankParts[(int)TankParts.WHEEL_SHADOW].color = botShadowColors[(int)color];
 	}
 
 	public void SetUITankParts(Image[] tankParts, PlayerColors color) {

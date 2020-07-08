@@ -10,33 +10,39 @@ using System.Runtime.CompilerServices;
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(TankSystem))]
 public sealed class TankSystem : UpdateSystem {
 
+	private const string WHEELS_ANIMATOR_BOOL_NAME = "Moving";
+
 	private static readonly (Vector3 noFlipX, Vector3 flipX) Tank_Flip_Scales = ( Vector3.one, new Vector3(-1, 1, 1) );
 
 	public override void OnAwake() { }
 
 	public override void OnUpdate(float deltaTime) {
-		ref Filter.ComponentsBag<GameObjectComponent> tankGameObjectBag = ref All_Tanks_Filter.Select<GameObjectComponent>();
+		ref Filter.ComponentsBag<GameObjectComponent> gameObjectBag = ref All_Tanks_Filter.Select<GameObjectComponent>();
 		ref Filter.ComponentsBag<TankComponent> tankBag = ref All_Tanks_Filter.Select<TankComponent>();
-		ref Filter.ComponentsBag<TeamComponent> tankTeamBag = ref All_Tanks_Filter.Select<TeamComponent>();
+		ref Filter.ComponentsBag<TeamComponent> teamBag = ref All_Tanks_Filter.Select<TeamComponent>();
+		ref Filter.ComponentsBag<AnimatorComponent> animatorBag = ref All_Tanks_Filter.Select<AnimatorComponent>();
 
 		for (int i = 0; i < All_Tanks_Filter.Length; i++) {
-			ref GameObjectComponent tankGameObjectComponent = ref tankGameObjectBag.GetComponent(i);
-			if (!tankGameObjectComponent.Self.activeSelf)
+			ref GameObjectComponent gameObjectComponent = ref gameObjectBag.GetComponent(i);
+			if (!gameObjectComponent.Self.activeSelf)
 				continue;
 
 			ref TankComponent tankComponent = ref tankBag.GetComponent(i);
-			ref TeamComponent tankTeamComponent = ref tankTeamBag.GetComponent(i);
+			ref TeamComponent teamComponent = ref teamBag.GetComponent(i);
+			ref AnimatorComponent wheelsAnimatorComponent = ref animatorBag.GetComponent(i);
 
-			if (tankTeamComponent.Team != PlayManager.frozenTeam) {
+			if (teamComponent.Team != PlayManager.frozenTeam) {
 				switch (tankComponent.TankState) {
 					case States.IDLE:
-						Fire(ref tankComponent, ref tankTeamComponent);
-						Rotate(ref tankGameObjectComponent, ref tankComponent);
+						wheelsAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, false);
+						Fire(ref tankComponent, ref teamComponent);
+						Rotate(ref gameObjectComponent, ref tankComponent);
 						break;
 					case States.MOVING:
-						Fire(ref tankComponent, ref tankTeamComponent);
-						Rotate(ref tankGameObjectComponent, ref tankComponent);
-						Move(ref tankGameObjectComponent, ref tankComponent, deltaTime);
+						wheelsAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, true);
+						Fire(ref tankComponent, ref teamComponent);
+						Rotate(ref gameObjectComponent, ref tankComponent);
+						Move(ref gameObjectComponent, ref tankComponent, deltaTime);
 						break;
 					default:
 						break;
@@ -46,20 +52,20 @@ public sealed class TankSystem : UpdateSystem {
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void Move(ref GameObjectComponent tankGameObjectComponent, ref TankComponent tankComponent, float deltaTime) => tankGameObjectComponent.SelfTransform.Translate(tankComponent.Velocity * Vector_Up * deltaTime);
+	private void Move(ref GameObjectComponent gameObjectComponent, ref TankComponent tankComponent, float deltaTime) => gameObjectComponent.SelfTransform.Translate(tankComponent.Velocity * Vector_Up * deltaTime);
 
-	private void Rotate(ref GameObjectComponent tankGameObjectComponent, ref TankComponent tankComponent) {
+	private void Rotate(ref GameObjectComponent gameObjectComponent, ref TankComponent tankComponent) {
 		if (tankComponent.TankDirection != tankComponent.OldDirection) {
 			tankComponent.OldDirection = tankComponent.TankDirection;
-			tankGameObjectComponent.SelfTransform.localRotation = Rotations[(int)tankComponent.TankDirection];
+			gameObjectComponent.SelfTransform.localRotation = Rotations[(int)tankComponent.TankDirection];
 			switch (tankComponent.TankDirection) {
 				case Directions.UP:
 				case Directions.RIGHT:
-					tankGameObjectComponent.SelfTransform.localScale = Tank_Flip_Scales.noFlipX;
+					gameObjectComponent.SelfTransform.localScale = Tank_Flip_Scales.noFlipX;
 					break;
 				case Directions.DOWN:
 				case Directions.LEFT:
-					tankGameObjectComponent.SelfTransform.localScale = Tank_Flip_Scales.flipX;
+					gameObjectComponent.SelfTransform.localScale = Tank_Flip_Scales.flipX;
 					break;
 				default:
 					break;
@@ -67,17 +73,16 @@ public sealed class TankSystem : UpdateSystem {
 		}
 	}
 
-	private void Fire(ref TankComponent tankComponent, ref TeamComponent tankTeamComponent) {
+	private void Fire(ref TankComponent tankComponent, ref TeamComponent teamComponent) {
 		if (tankComponent.Fired) {
 			if ((Time.time - tankComponent.LastTimeShot) >= tankComponent.FirePeriod) {
-				IEntity bulletEntity = BulletPoolManager.Instance.EnsureObject(tankComponent.BulletStartPoint.position, Rotations[(int)tankComponent.TankDirection], BulletPoolManager.Instance.transform);
-				ref GameObjectComponent bulletGameObjectComponent = ref bulletEntity.GetComponent<GameObjectComponent>();
-				ref BulletComponent bulletComponent = ref NotHasGet<BulletComponent>(bulletEntity);
-				ref TeamComponent bulletTeamComponent = ref NotHasGet<TeamComponent>(bulletEntity);
+				ref GameObjectComponent tempGameObjectComponent = ref BulletPoolManager.Instance.EnsureObject(tankComponent.BulletStartPoint.position, Rotations[(int)tankComponent.TankDirection], BulletPoolManager.Instance.transform);
+				ref BulletComponent bulletComponent = ref NotHasGet<BulletComponent>(tempGameObjectComponent.SelfEntity);
+				ref TeamComponent tempTeamComponent = ref NotHasGet<TeamComponent>(tempGameObjectComponent.SelfEntity);
 
 				bulletComponent.Velocity = PlayManager.Instance.standardBulletVelocity;
 				bulletComponent.CanDestroySteel = tankComponent.CanShootSteel;
-				bulletTeamComponent.Team = tankTeamComponent.Team;
+				tempTeamComponent.Team = teamComponent.Team;
 				tankComponent.LastTimeShot = Time.time;
 
 				if (tankComponent.CanDoDoubleShot) {

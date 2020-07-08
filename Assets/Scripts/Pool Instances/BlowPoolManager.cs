@@ -4,7 +4,7 @@ using Morpeh;
 using UnityEngine;
 using static Statics;
 
-public class BlowPoolManager : EntityPool
+public class BlowPoolManager : PoolManager
 {
 
 	private const string BIG_BLOW_TRIGGER = "Big Blow";
@@ -14,8 +14,7 @@ public class BlowPoolManager : EntityPool
 
 	private Transform selfTransform;
 
-	protected override void Awake() {
-		base.Awake();
+	private void Awake() {
 		if (Instance == null) {
 			Instance = this;
 		}
@@ -25,13 +24,12 @@ public class BlowPoolManager : EntityPool
 	}
 
 	public void RequestBlow(bool isSmall, Vector3 atPosition) {
-		IEntity blowEntity = EnsureObject(atPosition, selfTransform);
-		ref GameObjectComponent blowGameObjectComponent = ref blowEntity.GetComponent<GameObjectComponent>();
-		ref AnimatorComponent blowAnimatorComponent = ref NotHasGet<AnimatorComponent>(blowEntity);
-		if (blowAnimatorComponent.SelfAnimator == null) {
-			blowAnimatorComponent.SelfAnimator = blowGameObjectComponent.Self.GetComponent<Animator>();
+		ref GameObjectComponent gameObjectComponent = ref EnsureObject(atPosition, selfTransform);
+		ref AnimatorComponent animatorComponent = ref NotHasGet<AnimatorComponent>(gameObjectComponent.SelfEntity);
+		if (animatorComponent.SelfAnimator == null) {
+			animatorComponent.SelfAnimator = gameObjectComponent.Self.GetComponent<Animator>();
 		}
-		StartCoroutine("AnimationRoutine", (blowEntity, blowAnimatorComponent.SelfAnimator, isSmall));
+		StartCoroutine("AnimationRoutine", (gameObjectComponent.SelfEntity, animatorComponent.SelfAnimator, isSmall));
 	}
 
 	private IEnumerator AnimationRoutine((IEntity entity, Animator animator, bool isSmall) data) {
