@@ -1,8 +1,8 @@
 ﻿public interface IPool<T>
 {
 
-	T EnsureObject();
+	T Get();
 
-	void DestroyObject(T poolObject);
+	void Remove(T poolObject);
 
 }

@@ -18,9 +18,12 @@ public class BulletCollision : MonoBehaviour
 	private void OnCollisionEnter2D(Collision2D collision) {
 		TryDecreaseHealth(collision.collider.GetComponent<IEntityProvider>()?.Entity);
 
+		if (bulletEntity == null) {
+			;
+		}
 		ref GameObjectComponent bulletGameObjectComponent = ref bulletEntity.GetComponent<GameObjectComponent>();
 		BlowPoolManager.Instance.RequestBlow(true, bulletGameObjectComponent.SelfTransform.position);
-		BulletPoolManager.Instance.DestroyObject(bulletGameObjectComponent.SelfEntity);
+		BulletPoolManager.Instance.Remove(bulletGameObjectComponent.SelfEntity);
 	}
 
 	// Check if the bullet hit something with Trigger(Leaves)
@@ -101,7 +104,7 @@ public class BulletCollision : MonoBehaviour
 					break;
 			}
 
-			Pools[(int)hitHealthComponent.PoolOwner].DestroyObject(hitGameObjectComponent.SelfEntity);
+			Pools[(int)hitHealthComponent.PoolOwner].Remove(hitGameObjectComponent.SelfEntity);
 		}
 	}
 

@@ -41,7 +41,7 @@ public class PlayerCollision : MonoBehaviour
 					ref TeamComponent tankTeamComponent = ref tankTeamBag.GetComponent(i);
 					if (tankTeamComponent.Team != playerTeamComponent.Team) { // Kills everybody in the other team
 						BlowPoolManager.Instance.RequestBlow(false, tankGameObjectComponent.SelfTransform.position);
-						Pools[(int)KnownPools.TANK].DestroyObject(tankGameObjectComponent.SelfEntity);
+						Pools[(int)KnownPools.TANK].Remove(tankGameObjectComponent.SelfEntity);
 					}
 				}
 				SpawnManager.Instance.RespawnPlayer(playerTeamComponent.Team == Teams.TOP ? Teams.BOTTOM : Teams.TOP);
@@ -90,7 +90,7 @@ public class PlayerCollision : MonoBehaviour
 			UIManager.Instance.AddScoreCoroutine(BONUS_SCORE, playerTeamComponent.Team);
 		}
 
-		Pools[(int)KnownPools.BONUS].DestroyObject(bonusEntity);
+		Pools[(int)KnownPools.BONUS].Remove(bonusEntity);
 	}
 
 }

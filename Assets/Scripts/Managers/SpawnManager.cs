@@ -84,13 +84,13 @@ public class SpawnManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void RespawnPlayer(Teams team) {
-		IEntity playerEntity = TankPoolManager.Instance.EnsureObject(playerSpawnPoints[(int)team], tankPoolTransform);
+		IEntity playerEntity = TankPoolManager.Instance.Get(playerSpawnPoints[(int)team], tankPoolTransform);
 		CorrectData(playerEntity, team, TankTypes.PLAYER, PLAYER_TAG);
 		SpawnPlayerCoroutine(playerEntity, team);
 	}
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void RespawnBot(BotSides botSide) {
-		IEntity botEntity = TankPoolManager.Instance.EnsureObject(botSpawnPoints[(int)botSide], tankPoolTransform);
+		IEntity botEntity = TankPoolManager.Instance.Get(botSpawnPoints[(int)botSide], tankPoolTransform);
 		CorrectData(botEntity, (botSide == BotSides.TOP_LEFT || botSide == BotSides.TOP_RIGHT ? Teams.TOP : Teams.BOTTOM), TankTypes.BOT, BOT_TAG);
 		SpawnBotCoroutine(botEntity, botSide);
 
@@ -163,15 +163,15 @@ public class SpawnManager : MonoBehaviour
 		// Set default values
 		switch (tankType) {
 			case TankTypes.PLAYER:
+				tankComponent.TankState = States.IDLE;
 				tankHealthComponent.Health = (int)standardPlayerLives;
 				UIManager.Instance.SetLife(tankTeamComponent.Team, (int)standardPlayerLives);
 				ref PlayerComponent playerComponent = ref NotHasGet<PlayerComponent>(tankEntity);
 				SkinManager.Instance.SetPlayerSkin(ref tankComponent, ref playerComponent, SkinManager.playersSkin[(int)team]);
 				break;
 			case TankTypes.BOT:
-				tankComponent.TankLevel = (TankLevels)Random.Range(0, (int)TankLevels.COUNT);
 				tankComponent.TankState = States.MOVING;
-				tankAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, false);
+				tankComponent.TankLevel = (TankLevels)Random.Range(0, (int)TankLevels.COUNT);
 				tankHealthComponent.Health = (int)tankComponent.TankLevel * (int)standardBotLives;
 				SkinManager.Instance.SetBotSkin(ref tankComponent, SkinManager.botsSkin[(int)team]);
 				break;
@@ -179,7 +179,6 @@ public class SpawnManager : MonoBehaviour
 				break;
 		}
 		tankComponent.TankDirection = team == Teams.TOP ? Directions.DOWN : Directions.UP;
-		tankComponent.TankState = States.IDLE;
 	}
 
 	/// <summary>
@@ -189,7 +188,7 @@ public class SpawnManager : MonoBehaviour
 		BufferVector.x = Random.Range(MapTopLeftCorner.x + 1f, MapBottomRightCorner.x - 1f);
 		BufferVector.y = Random.Range(MapTopLeftCorner.y - 1f, MapBottomRightCorner.y + 1f);
 		BonusTypes bonus = (BonusTypes)Random.Range(0, (int)BonusTypes.COUNT);
-		IEntity bonusEntity = BonusPoolManager.Instance.EnsureObject(BufferVector, spawnTransform);
+		IEntity bonusEntity = BonusPoolManager.Instance.Get(BufferVector, spawnTransform);
 		ref GameObjectComponent bonusGameObjectComponent = ref bonusEntity.GetComponent<GameObjectComponent>();
 		ref BonusComponent bonusComponent = ref NotHasGet<BonusComponent>(bonusEntity);
 		ref SpriteRendererComponent bonusRendererComponent = ref NotHasGet<SpriteRendererComponent>(bonusEntity);
@@ -209,6 +208,10 @@ public class SpawnManager : MonoBehaviour
 		ref GameObjectComponent botGameObjectComponent = ref botEntity.GetComponent<GameObjectComponent>();
 		botGameObjectComponent.Self.SetActive(botState);
 		botSpawnPointObjects[(int)botSide].SetActive(!botState);
+		if (botState) {
+			ref AnimatorComponent botAnimatorComponent = ref botEntity.GetComponent<AnimatorComponent>();
+			botAnimatorComponent.SelfAnimator.SetBool(WHEELS_ANIMATOR_BOOL_NAME, true);
+		}
 	}
 	private IEnumerator SpawnBotInitializationRoutine((IEntity botEntity, BotSides botSide) data) {
 		FlipBotSpawns(data.botEntity, data.botSide, false);
@@ -285,7 +288,7 @@ public class SpawnManager : MonoBehaviour
 			yield return bonusBlinkWFS;
 			bonusRenderer.enabled = true;
 		}
-		BonusPoolManager.Instance.DestroyObject(bonusEntity);
+		BonusPoolManager.Instance.Remove(bonusEntity);
 	}
 
 	//
