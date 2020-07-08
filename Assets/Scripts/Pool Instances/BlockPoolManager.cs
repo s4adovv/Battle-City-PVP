@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockPoolManager : PoolManager
+public class BlockPoolManager : EntityPool
 {
 
 	public static BlockPoolManager Instance;
 
-	private void Awake() {
+	protected override void Awake() {
+		base.Awake();
 		if (Instance == null) {
 			Instance = this;
 		}

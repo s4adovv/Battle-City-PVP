@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletPoolManager : PoolManager
+public class BulletPoolManager : EntityPool
 {
 
 	public static BulletPoolManager Instance;
 
-	private void Awake() {
+	protected override void Awake() {
+		base.Awake();
 		if (Instance == null) {
 			Instance = this;
 		}

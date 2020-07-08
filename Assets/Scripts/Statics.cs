@@ -39,7 +39,9 @@ public static class Statics
 
    #endregion
 
-	public const string PLAYER_TAG = "Player";
+   public const string WHEELS_ANIMATOR_BOOL_NAME = "Moving";
+
+   public const string PLAYER_TAG = "Player";
    public const string BOT_TAG = "Bot";
    public const string FLAG_TAG = "Flag";
    public const string BONUS_TAG = "Bonus";
@@ -87,7 +89,7 @@ public static class Statics
    public static Vector3 MapTopLeftCorner;
    public static Vector3 MapBottomRightCorner;
 
-   public static PoolManager[] Pools = new PoolManager[(int)KnownPools.COUNT]; // You should fill it after instancing
+   public static EntityPool[] Pools = new EntityPool[(int)KnownPools.COUNT]; // You should fill it after instancing
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    public static ref T NotHasGet<T>(IEntity entity) where T : struct, IComponent {
