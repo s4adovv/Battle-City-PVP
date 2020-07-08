@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0078: The 'l' suffix is easily confused with the digit '1'
+dotnet_diagnostic.CS0078.severity = none

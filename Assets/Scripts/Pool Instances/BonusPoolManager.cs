@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BonusPoolManager : PoolManager
+public class BonusPoolManager : EntityPool
 {
 
 	public static BonusPoolManager Instance;
 
-	private void Awake() {
+	protected override void Awake() {
+		base.Awake();
 		if (Instance == null) {
 			Instance = this;
 		}
