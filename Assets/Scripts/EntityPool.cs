@@ -15,8 +15,7 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 	private const int DATA_USAGE_INCREASER = 8;
 	private const int ULONG_TYPE_BIT_SIZE = sizeof(ulong) * 8; // 8 bits
 
-	public int MaxPoolSize => maxPoolSize;
-	public GameObject DefaultPrefab => defaultPrefab;
+	public Transform SelfTransformAsParent => selfTransformAsParent;
 
 	//HACK: if you want to Instantiate and Destroy without pooling objects, then just set it to 0
 	[SerializeField][Range(0, int.MaxValue / 2)] protected int maxPoolSize;
@@ -28,10 +27,7 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 	/// Default GameObject which will be used during the Instantiation.
 	/// </summary>
 	[SerializeField] protected GameObject defaultPrefab;
-	/// <summary>
-	/// The default parent to attach an object to.
-	/// </summary>
-	[SerializeField] protected Transform unsortedPoolParent;
+	protected Transform selfTransformAsParent;
 
 	private int poolSize;
 
@@ -42,35 +38,40 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 	private List<IEntity> pool;
 
 	private ulong* inUsageData;
-	private int inUsageDataSize;
+	private int inUsageDataMaxSize, inUsageDataCurrentSize;
 
 	protected virtual void Awake() {
+		selfTransformAsParent = transform;
+
 		pool = new List<IEntity>(maxPoolSize);
-		inUsageDataSize = DATA_USAGE_INCREASER;
-		inUsageData = (ulong*)Marshal.AllocHGlobal(inUsageDataSize * sizeof(ulong));
-		PrePool(prePoolCount, defaultPrefab, unsortedPoolParent);
+		inUsageDataMaxSize = DATA_USAGE_INCREASER;
+		inUsageDataCurrentSize = 1;
+		inUsageData = (ulong*)Marshal.AllocHGlobal(inUsageDataMaxSize * sizeof(ulong));
+		RtlZeroMemory((IntPtr)inUsageData, (UIntPtr)(inUsageDataMaxSize * sizeof(ulong)));
+
+		PrePool(prePoolCount, defaultPrefab, selfTransformAsParent);
 	}
 
 	private void OnDestroy() {
 		Marshal.FreeHGlobal((IntPtr)inUsageData);
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get() => Get(defaultPrefab, Vector_Zero, Quaternion_Identity, unsortedPoolParent);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab) => Get(prefab, Vector_Zero, Quaternion_Identity, unsortedPoolParent);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Vector3 position) => Get(defaultPrefab, position, Quaternion_Identity, unsortedPoolParent);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Quaternion rotation) => Get(defaultPrefab, Vector_Zero, rotation, unsortedPoolParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get() => Get(defaultPrefab, Vector_Zero, Quaternion_Identity, selfTransformAsParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab) => Get(prefab, Vector_Zero, Quaternion_Identity, selfTransformAsParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Vector3 position) => Get(defaultPrefab, position, Quaternion_Identity, selfTransformAsParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Quaternion rotation) => Get(defaultPrefab, Vector_Zero, rotation, selfTransformAsParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Transform parent) => Get(defaultPrefab, Vector_Zero, Quaternion_Identity, parent);
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Vector3 position, Quaternion rotation) => Get(defaultPrefab, position, rotation, unsortedPoolParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Vector3 position, Quaternion rotation) => Get(defaultPrefab, position, rotation, selfTransformAsParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Vector3 position, Transform parent) => Get(defaultPrefab, position, Quaternion_Identity, parent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Quaternion rotation, Transform parent) => Get(defaultPrefab, Vector_Zero, rotation, parent);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Vector3 position) => Get(prefab, position, Quaternion_Identity, unsortedPoolParent);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Quaternion rotation) => Get(prefab, Vector_Zero, rotation, unsortedPoolParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Vector3 position) => Get(prefab, position, Quaternion_Identity, selfTransformAsParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Quaternion rotation) => Get(prefab, Vector_Zero, rotation, selfTransformAsParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Transform parent) => Get(prefab, Vector_Zero, Quaternion_Identity, parent);
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(Vector3 position, Quaternion rotation, Transform parent) => Get(defaultPrefab, position, rotation, parent);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Vector3 position, Quaternion rotation) => Get(prefab, position, rotation, unsortedPoolParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Vector3 position, Quaternion rotation) => Get(prefab, position, rotation, selfTransformAsParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Vector3 position, Transform parent) => Get(prefab, position, Quaternion_Identity, parent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public IEntity Get(GameObject prefab, Quaternion rotation, Transform parent) => Get(prefab, Vector_Zero, rotation, parent);
 
@@ -85,9 +86,7 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 		if (maxPoolSize == 0)
 			return CreateStandardEntity(prefab, position, rotation, parent, true);
 
-		if (poolSize > maxPoolSize) {
-			DestroyOutOfRangeObjects();
-		}
+		DestroyOutOfRangeObjects();
 		int index = FindFreeObjectInPool();
 
 		if (index != -1) {
@@ -122,32 +121,30 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 			return;
 		}
 
-		if (poolSize <= maxPoolSize) {
-			ref GameObjectComponent gameObjectComponent = ref entity.GetComponent<GameObjectComponent>();
-			SetUsage(FindPoolIDByEntityID(entity.ID), false);
-			if (destroyAttachedGameObject) {
-				gameObjectComponent.Self.SetActive(false);
-			}
-		} else {
-			pool.RemoveAt(FindPoolIDByEntityID(entity.ID));
-			if (destroyAttachedGameObject) {
+		DestroyOutOfRangeObjects();
+		if (entity.ID != -1) {
+			if (poolSize <= maxPoolSize) {
 				ref GameObjectComponent gameObjectComponent = ref entity.GetComponent<GameObjectComponent>();
-				Destroy(gameObjectComponent.Self);
+				SetUsage(FindPoolIDByEntityID(entity.ID), false);
+				if (destroyAttachedGameObject) {
+					gameObjectComponent.Self.SetActive(false);
+				}
+			} else {
+				int index = FindPoolIDByEntityID(entity.ID);
+				pool.RemoveAt(index);
+				DeleteUsage(index);
+				if (destroyAttachedGameObject) {
+					ref GameObjectComponent gameObjectComponent = ref entity.GetComponent<GameObjectComponent>();
+					Destroy(gameObjectComponent.Self);
+				}
+				Default_World.RemoveEntity(entity);
+				poolSize--;
 			}
-			Default_World.RemoveEntity(entity);
-			poolSize--;
 		}
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void FreeObject(IEntity entity, bool gameObjectActiveSelf) {
-		ref GameObjectComponent gameObjectComponent = ref entity.GetComponent<GameObjectComponent>();
-		gameObjectComponent.Self.SetActive(gameObjectActiveSelf);
-		SetUsage(FindPoolIDByEntityID(entity.ID), false);
-	}
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void FreePool(bool gameObjectActiveSelf) {
+		DestroyOutOfRangeObjects();
 		for (int i = 0; i < poolSize; i++) {
 			ref GameObjectComponent gameObjectComponent = ref pool[i].GetComponent<GameObjectComponent>();
 			gameObjectComponent.Self.SetActive(gameObjectActiveSelf);
@@ -155,7 +152,9 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 		}
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void PrePool(int count) => PrePool(count, defaultPrefab, unsortedPoolParent);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public bool IsEntityFree(IEntity entity) => !GetUsage(FindPoolIDByEntityID(entity.ID));
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void PrePool(int count) => PrePool(count, defaultPrefab, selfTransformAsParent);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void PrePool(int count, Transform parent) => PrePool(count, defaultPrefab, parent);
 
 	public void PrePool(int count, GameObject prefab, Transform parent) {
@@ -176,6 +175,7 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 				if (onlyNotInUsage) {
 					if (!GetUsage(i)) {
 						pool.RemoveAt(i);
+						DeleteUsage(i);
 						poolSize--;
 						if (destroyGameObjects) {
 							ref GameObjectComponent gameObjectComponent = ref entity.GetComponent<GameObjectComponent>();
@@ -185,6 +185,7 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 					}
 				} else {
 					pool.RemoveAt(i);
+					DeleteUsage(i);
 					poolSize--;
 					if (destroyGameObjects) {
 						ref GameObjectComponent gameObjectComponent = ref entity.GetComponent<GameObjectComponent>();
@@ -197,19 +198,21 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 	}
 
 	public void DestroyOutOfRangeObjects() {
-		int index = FindFreeObjectInPool();
-		while (index != -1 && poolSize > maxPoolSize) {
-			IEntity entity = pool[index];
-			GameObject go = entity.GetComponent<GameObjectComponent>().Self;
-			pool.RemoveAt(index);
-			Default_World.RemoveEntity(entity);
-			Destroy(go);
-			poolSize--;
-			index = FindFreeObjectInPool();
+		if (poolSize > maxPoolSize) {
+			int index = FindFreeObjectInPool();
+			while (index != -1 && poolSize > maxPoolSize) {
+				IEntity entity = pool[index];
+				GameObject go = entity.GetComponent<GameObjectComponent>().Self;
+				pool.RemoveAt(index);
+				DeleteUsage(index);
+				Default_World.RemoveEntity(entity);
+				Destroy(go);
+				poolSize--;
+				index = FindFreeObjectInPool();
+			}
 		}
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private IEntity CreateStandardEntity(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent, bool gameObjectActiveSelf) {
 		IEntity entity = Default_World.CreateEntity();
 		ref GameObjectComponent gameObjectComponent = ref entity.AddComponent<GameObjectComponent>();
@@ -231,16 +234,21 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 		return -1;
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void SetUsage(int index, bool inUsage) {
-		if (index >= (inUsageDataSize << DATA_USAGE_SHIFT)) {
-			inUsageDataSize += DATA_USAGE_INCREASER;
-			inUsageData = (ulong*)Marshal.ReAllocHGlobal((IntPtr)inUsageData, (IntPtr)(inUsageDataSize * sizeof(ulong)));
+		if (index >= (inUsageDataMaxSize << DATA_USAGE_SHIFT)) {
+			inUsageDataMaxSize += DATA_USAGE_INCREASER;
+			inUsageData = (ulong*)Marshal.ReAllocHGlobal((IntPtr)inUsageData, (IntPtr)(inUsageDataMaxSize * sizeof(ulong)));
+			for (int i = inUsageDataMaxSize - DATA_USAGE_INCREASER; i < inUsageDataMaxSize; i++) {
+				inUsageData[i] = 0;
+			}
+		}
+		if (index >= (inUsageDataCurrentSize << DATA_USAGE_SHIFT)) {
+			inUsageDataCurrentSize++;
 		}
 
 		int subIndex = index % ULONG_TYPE_BIT_SIZE;
 		index /= ULONG_TYPE_BIT_SIZE;
-
+		
 		if (inUsage) {
 			inUsageData[index] &= ~(0b1ul << subIndex);
 		} else {
@@ -256,9 +264,22 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 		return (inUsageData[index] & (0b1ul << subIndex)) == 0;
 	}
 
+	private void DeleteUsage(int index) { // List is dynamic positioned array so we should shift usage data if List.Remove was invoked.
+		if (index < ((inUsageDataCurrentSize - 1) << DATA_USAGE_SHIFT)) {
+			inUsageDataCurrentSize--;
+		}
+		int subIndex = index % ULONG_TYPE_BIT_SIZE;
+		index /= ULONG_TYPE_BIT_SIZE;
+		inUsageData[index] = (inUsageData[index] & (ulong.MaxValue >> (ULONG_TYPE_BIT_SIZE - subIndex))) | ((inUsageData[index] & (ulong.MaxValue << (subIndex + 1))) >> 1);
+		for (int i = index, j = i + 1, length = inUsageDataCurrentSize - 1; i < length; i++, j++) {
+			inUsageData[i] |= inUsageData[j] & 0b1ul;
+			inUsageData[j] >>= 1;
+		}
+	}
+
 	private int FindFreeObjectInPool() {
 		int tempIndex = -1;
-		for (int i = 0; i < inUsageDataSize; i++) {
+		for (int i = 0; i < inUsageDataCurrentSize; i++) {
 			ulong tempDataBlock = inUsageData[i];
 			if (tempDataBlock != 0) {
 				if ((tempDataBlock & (0xff_ff_ff_ff_00_00_00_00)) != 0) {
@@ -521,5 +542,8 @@ public unsafe class EntityPool : MonoBehaviour, IPool<IEntity>
 
 		return -1;
 	}
+
+	[DllImport("kernel32.dll")]
+	private static extern void RtlZeroMemory(IntPtr dst, UIntPtr length);
 
 }

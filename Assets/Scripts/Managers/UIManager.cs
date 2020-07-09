@@ -37,13 +37,15 @@ public class UIManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SetScore(Teams team, int score) => tanksScoreText[(int)team].text = score.ToString();
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SetTopPlayerColor(int color) { // Unity can't serialize enum in the UI events
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void SetTopPlayerColor(int color) { // Unity can't serialize enum in the UI events
 		SkinManager.playersSkin[(int)Teams.TOP] = (PlayerColors)color;
 		SkinManager.Instance.SetUITankParts(topTankBodyParts, (PlayerColors)color);
 		SkinManager.Instance.SetUIStar(tanksScoreStar[(int)Teams.BOTTOM], (PlayerColors)color);
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SetBottomPlayerColor(int color) { // Unity can't serialize enum in the UI events
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void SetBottomPlayerColor(int color) { // Unity can't serialize enum in the UI events
 		SkinManager.playersSkin[(int)Teams.BOTTOM] = (PlayerColors)color;
 		SkinManager.Instance.SetUITankParts(bottomTankBodyParts, (PlayerColors)color);
 		SkinManager.Instance.SetUIStar(tanksScoreStar[(int)Teams.BOTTOM], (PlayerColors)color);
@@ -80,19 +82,7 @@ public class UIManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void GameOverCoroutine(Teams wonTeam) => StartCoroutine("GameOverRoutine", wonTeam);
 	private IEnumerator GameOverRoutine(Teams wonTeam) {
-		SpawnManager.Instance.ClearAll();
-		PlayManager.Instance.StopAllCoroutines();
-		BlowPoolManager.Instance.StopAllCoroutines();
 		StopCoroutine("AddScoreRoutine");
-
-		AudioManager.Instance.StopSounds();
-		AudioManager.Instance.RequestSound(GameSounds.GAME_OVER);
-
-		BlockPoolManager.Instance.FreePool(false);
-		BlowPoolManager.Instance.FreePool(false);
-		BonusPoolManager.Instance.FreePool(false);
-		BulletPoolManager.Instance.FreePool(false);
-		TankPoolManager.Instance.FreePool(false);
 
 		gameResultText.text = wonTeam == Teams.TOP ? TOP_PLAYER_WON_TEXT : BOTTOM_PLAYER_WON_TEXT;
 		gameResultText.gameObject.SetActive(true);

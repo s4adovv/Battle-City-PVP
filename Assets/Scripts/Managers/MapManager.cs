@@ -33,15 +33,12 @@ public unsafe class MapManager : MonoBehaviour
 	[SerializeField] private Sprite[] blockSprites;
 	[SerializeField] private TextAsset[] maps;
 
-	private Transform mapTransform;
-
 	private void Awake() {
 		if (Instance == null) {
 			Instance = this;
 		}
 
-		mapTransform = transform;
-		MapTopLeftCorner = mapTransform.position;
+		MapTopLeftCorner = transform.position;
 		MapBottomRightCorner = new Vector3(MapTopLeftCorner.x + FULL_BLOCK_STEP * MAP_WIDTH, MapTopLeftCorner.y - FULL_BLOCK_STEP * MAP_HEIGHT);
 	}
 
@@ -70,7 +67,7 @@ public unsafe class MapManager : MonoBehaviour
 							break;
 						case MapCodes.FLAG:
 							if (i == 0 || (MapCodes)(*(ptr - Salted_Map_Width) & 0b1111) != MapCodes.FLAG) { // Check upper code to avoid duplication of Flag
-								CorrectBlockBehaviour(BlockPoolManager.Instance.Get(Get2x2BlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), BlockTypes.FLAG, flagStack++);
+								CorrectBlockBehaviour(BlockPoolManager.Instance.Get(Get2x2BlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity), BlockTypes.FLAG, flagStack++);
 							}
 							ptr += 2; // Skip because of (2x2) block size
 							j += 2;
@@ -91,7 +88,7 @@ public unsafe class MapManager : MonoBehaviour
 							break;
 						default:
 							BlockTypes tempType = (BlockTypes)(tempCode - 1); // Minus one because of the empty block
-							CorrectBlockBehaviour(BlockPoolManager.Instance.Get(GetBlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity, mapTransform), tempType, Teams.COUNT); // I set Teams.COUNT(It doesn't matter actually) because neither block has no team, except for flags
+							CorrectBlockBehaviour(BlockPoolManager.Instance.Get(GetBlockPosition(MapTopLeftCorner, j, i), Quaternion_Identity), tempType, Teams.COUNT); // I set Teams.COUNT(It doesn't matter actually) because neither block has no team, except for flags
 							ptr++;
 							j++;
 							break;
@@ -160,8 +157,6 @@ public unsafe class MapManager : MonoBehaviour
 					break;
 				case BlockTypes.FLAG:
 					blockGameObjectComponent.SelfTransform.localScale = Vector_One;
-					ref TeamComponent flagTeamComponent = ref NotHasGet<TeamComponent>(blockEntity);
-					flagTeamComponent.Team = team;
 					break;
 				default:
 					break;
@@ -179,6 +174,8 @@ public unsafe class MapManager : MonoBehaviour
 				break;
 			case BlockTypes.FLAG:
 				blockHealthComponent.Health = flagLives;
+				ref TeamComponent flagTeamComponent = ref NotHasGet<TeamComponent>(blockEntity);
+				flagTeamComponent.Team = team;
 				break;
 			default:
 				break;
