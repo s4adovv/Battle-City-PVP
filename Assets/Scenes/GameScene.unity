@@ -3188,7 +3188,6 @@ MonoBehaviour:
   prePoolCount: 10
   defaultPrefab: {fileID: 240608470212536910, guid: db238e27bb7123a4592f28ed1dace4e1,
     type: 3}
-  unsortedPoolParent: {fileID: 2022452771}
 --- !u!1 &864754297
 GameObject:
   m_ObjectHideFlags: 0
@@ -3238,7 +3237,6 @@ MonoBehaviour:
   prePoolCount: 10
   defaultPrefab: {fileID: 2775102066574430343, guid: 9169d7dad7ec6dd4693c5086900789c7,
     type: 3}
-  unsortedPoolParent: {fileID: 2022452771}
 --- !u!1 &929959935
 GameObject:
   m_ObjectHideFlags: 0
@@ -3587,7 +3585,6 @@ MonoBehaviour:
   prePoolCount: 10
   defaultPrefab: {fileID: 7964171518272818728, guid: 8918891daf0abc54d93cb5d8d7f1e701,
     type: 3}
-  unsortedPoolParent: {fileID: 2022452771}
 --- !u!1 &959489682
 GameObject:
   m_ObjectHideFlags: 0
@@ -3996,7 +3993,6 @@ MonoBehaviour:
   prePoolCount: 3
   defaultPrefab: {fileID: 1075768381440847167, guid: f6caf299c3f368c42b77fb87c69dcb81,
     type: 3}
-  unsortedPoolParent: {fileID: 2022452771}
 --- !u!4 &1067030030
 Transform:
   m_ObjectHideFlags: 0
@@ -4082,7 +4078,6 @@ MonoBehaviour:
   prePoolCount: 300
   defaultPrefab: {fileID: 908172568798516311, guid: 6c80a0c14ec0786458bc1f11d72eae60,
     type: 3}
-  unsortedPoolParent: {fileID: 2022452771}
 --- !u!114 &1071773807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4108,6 +4103,10 @@ MonoBehaviour:
   - {fileID: 3356085555644337159, guid: 969281c7e2b785e4095c7fd643b5a00d, type: 3}
   maps:
   - {fileID: 4900000, guid: a8f1cc4783ddeca4283266ff3c0ab24e, type: 3}
+  - {fileID: 4900000, guid: dd57780c18e67b847bb9288e27c8618f, type: 3}
+  - {fileID: 4900000, guid: d5db3f6d4a16462418fe97788f035a7f, type: 3}
+  - {fileID: 4900000, guid: 08ed198009b68954f85e447c9e7b8436, type: 3}
+  - {fileID: 4900000, guid: 8ba5adc62a7c8954896e53b6399fd331, type: 3}
 --- !u!1 &1146595662
 GameObject:
   m_ObjectHideFlags: 0
@@ -5996,36 +5995,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1949523940}
   m_CullTransparentMesh: 0
---- !u!1 &2022452770
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2022452771}
-  m_Layer: 0
-  m_Name: UnsortedPool
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
---- !u!4 &2022452771
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2022452770}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 10
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2022690518
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,10 +6,8 @@ using Unity.IL2CPP.CompilerServices;
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 [Il2CppSetOption(Option.DivideByZeroChecks, false)]
 [System.Serializable]
-public struct PlayerComponent : IComponent {
+public struct LastTimeComponent : IComponent {
 
-	public GameObject Shield;
-	public SpriteRenderer ShieldRenderer;
-	public GameObject Invulnerability;
+	public float LastTimeUsed;
 
 }
