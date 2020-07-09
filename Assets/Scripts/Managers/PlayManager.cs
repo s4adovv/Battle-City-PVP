@@ -36,7 +36,23 @@ public class PlayManager : MonoBehaviour
 		AudioManager.Instance.RequestSound(GameSounds.GAME_START);
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void GameOver(Teams wonTeam) => UIManager.Instance.GameOverCoroutine(wonTeam);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void GameOver(Teams wonTeam) {
+		StopCoroutine("SetPlayerInvulnerableRoutine");
+		StopCoroutine("SetPlayerShieldRoutine");
+		StopCoroutine("TimeStopRoutine");
+		SpawnManager.Instance.ClearAll();
+		BlowPoolManager.Instance.StopAllCoroutines();
+
+		AudioManager.Instance.StopSounds();
+		AudioManager.Instance.RequestSound(GameSounds.GAME_OVER);
+
+		BlockPoolManager.Instance.FreePool(false);
+		BlowPoolManager.Instance.FreePool(false);
+		BonusPoolManager.Instance.FreePool(false);
+		BulletPoolManager.Instance.FreePool(false);
+		TankPoolManager.Instance.FreePool(false);
+		UIManager.Instance.GameOverCoroutine(wonTeam);
+	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void SetPlayerInvulnerableCoroutine(IEntity playerEntity) => StartCoroutine("SetPlayerInvulnerableRoutine", playerEntity);
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

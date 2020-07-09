@@ -46,6 +46,8 @@ public static class Statics
    public const string FLAG_TAG = "Flag";
    public const string BONUS_TAG = "Bonus";
 
+   public const float PHYSICS_TIME = 0.1f;
+
    public static readonly string[] Block_Tags = new string[] {
       "Brick block",
       "Steel block",
