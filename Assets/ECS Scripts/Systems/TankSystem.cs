@@ -70,10 +70,11 @@ public sealed class TankSystem : UpdateSystem {
 	private void Fire(ref TankComponent tankComponent, ref TeamComponent tankTeamComponent) {
 		if (tankComponent.Fired) {
 			if ((Time.time - tankComponent.LastTimeShot) >= tankComponent.FirePeriod) {
-				IEntity bulletEntity = BulletPoolManager.Instance.Get(tankComponent.BulletStartPoint.position, Rotations[(int)tankComponent.TankDirection], BulletPoolManager.Instance.transform);
+				IEntity bulletEntity = BulletPoolManager.Instance.Get(tankComponent.BulletStartPoint.position, Rotations[(int)tankComponent.TankDirection]);
 				ref GameObjectComponent bulletGameObjectComponent = ref bulletEntity.GetComponent<GameObjectComponent>();
 				ref BulletComponent bulletComponent = ref NotHasGet<BulletComponent>(bulletEntity);
 				ref TeamComponent bulletTeamComponent = ref NotHasGet<TeamComponent>(bulletEntity);
+				NotHasGet<LastTimeComponent>(bulletEntity);
 
 				bulletComponent.Velocity = PlayManager.Instance.standardBulletVelocity;
 				bulletComponent.CanDestroySteel = tankComponent.CanShootSteel;

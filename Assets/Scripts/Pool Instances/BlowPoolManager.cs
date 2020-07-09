@@ -12,8 +12,6 @@ public class BlowPoolManager : EntityPool
 
 	public static BlowPoolManager Instance;
 
-	private Transform selfTransform;
-
 	protected override void Awake() {
 		base.Awake();
 		if (Instance == null) {
@@ -21,11 +19,10 @@ public class BlowPoolManager : EntityPool
 		}
 
 		Pools[(int)KnownPools.BLOW] = Instance;
-		selfTransform = transform;
 	}
 
 	public void RequestBlow(bool isSmall, Vector3 atPosition) {
-		IEntity blowEntity = Get(atPosition, selfTransform);
+		IEntity blowEntity = Get(atPosition);
 		ref GameObjectComponent blowGameObjectComponent = ref blowEntity.GetComponent<GameObjectComponent>();
 		ref AnimatorComponent blowAnimatorComponent = ref NotHasGet<AnimatorComponent>(blowEntity);
 		if (blowAnimatorComponent.SelfAnimator == null) {
@@ -37,7 +34,7 @@ public class BlowPoolManager : EntityPool
 	private IEnumerator AnimationRoutine((IEntity entity, Animator animator, bool isSmall) data) {
 		data.animator.SetTrigger(data.isSmall ? SMALL_BLOW_TRIGGER : BIG_BLOW_TRIGGER);
 		yield return new WaitForSeconds(data.animator.GetCurrentAnimatorStateInfo(0).length);
-		base.FreeObject(data.entity, false);
+		base.Remove(data.entity, true);
 		yield break;
 	}
 

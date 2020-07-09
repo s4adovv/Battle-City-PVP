@@ -38,7 +38,6 @@ public class SpawnManager : MonoBehaviour
 	private GameObject[] botSpawnPointObjects = new GameObject[(int)BotSides.COUNT];
 	private GameObject[] playerSpawnPointObjects = new GameObject[(int)Teams.COUNT];
 	private Transform spawnTransform;
-	private Transform tankPoolTransform;
 
 	// JUST IN CASE if you reading this... I found bug in your Morpeh ECS system: if you set GameObject.SetActive(false) then the entity sets its components information to default, or if you set ComponentProvider.enabled = false then this component will be set to default.
 
@@ -49,7 +48,6 @@ public class SpawnManager : MonoBehaviour
 		}
 
 		spawnTransform = transform;
-		tankPoolTransform = TankPoolManager.Instance.transform;
 
 		bonusBlinkWFS = new WaitForSeconds(BONUS_BLINK_TIME);
 #if !UNITY_EDITOR
@@ -84,13 +82,13 @@ public class SpawnManager : MonoBehaviour
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void RespawnPlayer(Teams team) {
-		IEntity playerEntity = TankPoolManager.Instance.Get(playerSpawnPoints[(int)team], tankPoolTransform);
+		IEntity playerEntity = TankPoolManager.Instance.Get(playerSpawnPoints[(int)team]);
 		CorrectData(playerEntity, team, TankTypes.PLAYER, PLAYER_TAG);
 		SpawnPlayerCoroutine(playerEntity, team);
 	}
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void RespawnBot(BotSides botSide) {
-		IEntity botEntity = TankPoolManager.Instance.Get(botSpawnPoints[(int)botSide], tankPoolTransform);
+		IEntity botEntity = TankPoolManager.Instance.Get(botSpawnPoints[(int)botSide]);
 		CorrectData(botEntity, (botSide == BotSides.TOP_LEFT || botSide == BotSides.TOP_RIGHT ? Teams.TOP : Teams.BOTTOM), TankTypes.BOT, BOT_TAG);
 		SpawnBotCoroutine(botEntity, botSide);
 
@@ -123,8 +121,9 @@ public class SpawnManager : MonoBehaviour
 		ref HealthComponent tankHealthComponent = ref NotHasGet<HealthComponent>(tankEntity);
 		ref TankComponent tankComponent = ref NotHasGet<TankComponent>(tankEntity);
 		ref TeamComponent tankTeamComponent = ref NotHasGet<TeamComponent>(tankEntity);
+		NotHasGet<LastTimeComponent>(tankEntity);
 
-		// If this is an object with other presets, then set standard components
+		// If this is an entity with other presets, then set standard components
 		if (tankGameObjectComponent.Self.tag != tankTag) {
 			tankGameObjectComponent.Self.tag = tankTag;
 
@@ -135,6 +134,7 @@ public class SpawnManager : MonoBehaviour
 					playerComponent.Invulnerability = tankGameObjectComponent.SelfTransform.GetChild(PLAYER_INVULNERABILITY_CHILD_ID).gameObject;
 					playerComponent.Shield = tankGameObjectComponent.SelfTransform.GetChild(PLAYER_SHIELD_CHILD_ID).gameObject;
 					playerComponent.ShieldRenderer = playerComponent.Shield.GetComponent<SpriteRenderer>();
+					tankComponent.TankLevel = TankLevels.FIRST;
 					break;
 				case TankTypes.BOT:
 					HasRemove<PlayerComponent>(tankEntity);
@@ -144,10 +144,8 @@ public class SpawnManager : MonoBehaviour
 					break;
 			}
 			tankComponent.TankType = tankType;
-			tankComponent.TankLevel = TankLevels.FIRST;
 			tankComponent.FirePeriod = PlayManager.Instance.standardTankFirePeriod;
 			tankComponent.Velocity = PlayManager.Instance.standardTankVelocity;
-			tankTeamComponent.Team = team;
 
 			if (tankComponent.BulletStartPoint == null) {
 				tankComponent.BulletStartPoint = tankGameObjectComponent.SelfTransform.GetChild(BULLET_SPAWN_POINT_CHILD_ID);
@@ -178,6 +176,7 @@ public class SpawnManager : MonoBehaviour
 			default:
 				break;
 		}
+		tankTeamComponent.Team = team;
 		tankComponent.TankDirection = team == Teams.TOP ? Directions.DOWN : Directions.UP;
 	}
 
@@ -188,7 +187,7 @@ public class SpawnManager : MonoBehaviour
 		BufferVector.x = Random.Range(MapTopLeftCorner.x + 1f, MapBottomRightCorner.x - 1f);
 		BufferVector.y = Random.Range(MapTopLeftCorner.y - 1f, MapBottomRightCorner.y + 1f);
 		BonusTypes bonus = (BonusTypes)Random.Range(0, (int)BonusTypes.COUNT);
-		IEntity bonusEntity = BonusPoolManager.Instance.Get(BufferVector, spawnTransform);
+		IEntity bonusEntity = BonusPoolManager.Instance.Get(BufferVector);
 		ref GameObjectComponent bonusGameObjectComponent = ref bonusEntity.GetComponent<GameObjectComponent>();
 		ref BonusComponent bonusComponent = ref NotHasGet<BonusComponent>(bonusEntity);
 		ref SpriteRendererComponent bonusRendererComponent = ref NotHasGet<SpriteRendererComponent>(bonusEntity);
@@ -282,6 +281,9 @@ public class SpawnManager : MonoBehaviour
 		SpriteRenderer bonusRenderer = bonusEntity.GetComponent<SpriteRendererComponent>().SelfRenderer;
 		float tempDuration = bonusHidingDuration;
 		while (tempDuration > BONUS_HIDING_BELOW_LIMIT) {
+			if (BonusPoolManager.Instance.IsEntityFree(bonusEntity)) {
+				yield break;
+			}
 			tempDuration *= bonusHidingScale;
 			yield return new WaitForSeconds(tempDuration);
 			bonusRenderer.enabled = false;
@@ -289,6 +291,8 @@ public class SpawnManager : MonoBehaviour
 			bonusRenderer.enabled = true;
 		}
 		BonusPoolManager.Instance.Remove(bonusEntity);
+
+		yield break;
 	}
 
 	//

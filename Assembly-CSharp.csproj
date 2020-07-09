@@ -72,6 +72,7 @@
     <Compile Include="Assets\ECS Scripts\Components\CommonComponents\GameObjectComponent.cs" />
     <Compile Include="Assets\ECS Scripts\Components\CommonComponents\SpriteRendererComponent.cs" />
     <Compile Include="Assets\ECS Scripts\Components\HealthComponent.cs" />
+    <Compile Include="Assets\ECS Scripts\Components\LastTimeComponent.cs" />
     <Compile Include="Assets\ECS Scripts\Components\Obsolete\SkinComponent.cs" />
     <Compile Include="Assets\ECS Scripts\Components\PlayerComponent.cs" />
     <Compile Include="Assets\ECS Scripts\Components\TankComponent.cs" />
@@ -98,8 +99,6 @@
     <Compile Include="Assets\Scripts\Managers\SkinManager.cs" />
     <Compile Include="Assets\Scripts\Managers\SpawnManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
-    <Compile Include="Assets\Scripts\Monobehaviour Callbacks\BulletCollision.cs" />
-    <Compile Include="Assets\Scripts\Monobehaviour Callbacks\PlayerCollision.cs" />
     <Compile Include="Assets\Scripts\Pool Instances\BlockPoolManager.cs" />
     <Compile Include="Assets\Scripts\Pool Instances\BlowPoolManager.cs" />
     <Compile Include="Assets\Scripts\Pool Instances\BonusPoolManager.cs" />
@@ -110,11 +109,15 @@
     <None Include="Assets\ScriptTemplates\ECS__System.cs.txt" />
     <None Include="Assets\ScriptTemplates\ECS__Initializer.cs.txt" />
     <None Include="Assets\ScriptTemplates\ECS__LateSystem.cs.txt" />
+    <None Include="Assets\Resources\Level maps(30x18)\2.txt" />
     <None Include="Assets\ScriptTemplates\ECS__Component.cs.txt" />
-    <None Include="Assets\Resources\Level maps(29x18)\Map readme.txt" />
-    <None Include="Assets\Resources\Level maps(29x18)\0.txt" />
+    <None Include="Assets\Resources\Level maps(30x18)\3.txt" />
+    <None Include="Assets\Resources\Level maps(30x18)\Map readme.txt" />
+    <None Include="Assets\Resources\Level maps(30x18)\0.txt" />
     <None Include="Assets\ScriptTemplates\ECS__FixedSystem.cs.txt" />
+    <None Include="Assets\Resources\Level maps(30x18)\4.txt" />
     <None Include="Assets\ScriptTemplates\ECS__Globals__CustomEvent.cs.txt" />
+    <None Include="Assets\Resources\Level maps(30x18)\1.txt" />
     <None Include="Assets\ScriptTemplates\ECS__Provider.cs.txt" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/PROGRAMMING STUFF/PROJECTS/Unity/Battle-City-PVP/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
