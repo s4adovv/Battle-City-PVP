@@ -67,9 +67,8 @@ public class LocalizationManager : MonoBehaviour
 	[MethodImpl(MethodImplOptions.AggressiveInlining)] public void ChangeLanguage() => LocalizeAll(languagesCodes[(Array.IndexOf(languagesCodes, currentLanguageCode) + 1) % languagesCodes.Length]);
 
 	/// <summary>
-	/// Returns localized sentence.
+	/// Returns default language sentence.
 	/// </summary>
-	/// <param name="languageCode">What language to look for. Example: "en_US".</param>
 	/// <param name="sentenceKey">What sentence to look for. Example: "game_name".</param>
 	/// <exception cref="ArgumentException"></exception>
 	public string Localize(string sentenceKey) {
@@ -105,7 +104,7 @@ public class LocalizationManager : MonoBehaviour
 	/// Tries to localize all known localization elements.
 	/// </summary>
 	/// <param name="languageCode">What language to look for. Example: "en_US".</param>
-	/// <exception cref="ArgumentException"></exception>
+	/// <exception cref="Exception"></exception>
 	public void LocalizeAll(string languageCode) {
 		string tempSentence;
 		if (TrySetCurrentLanguage(languageCode)) {
@@ -147,11 +146,12 @@ public class LocalizationManager : MonoBehaviour
 		return true;
 	}
 
+
 	/// <summary>
-	/// Tries to serialize a given language and create a new Dictionary.
+	/// Tries to deserialize a given language and create a new Dictionary.
 	/// </summary>
 	/// <param name="languageCode">What language to look for. Example: "en_US".</param>
-	/// <exception cref="ArgumentException"></exception>
+	/// <param name="language">Out language dictionary.</param>
 	private bool TryDeserializeLanguage(string languageCode, out Dictionary<string, string> language) {
 		language = null;
 		int index = Array.IndexOf(languagesCodes, languageCode);
