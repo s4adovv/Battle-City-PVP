@@ -159,6 +159,8 @@ public class SpawnManager : MonoBehaviour
 		}
 
 		// Set default values
+		tankTeamComponent.Team = team;
+		tankComponent.TankDirection = team == Teams.TOP ? Directions.DOWN : Directions.UP;
 		switch (tankType) {
 			case TankTypes.PLAYER:
 				tankComponent.TankState = States.IDLE;
@@ -176,8 +178,6 @@ public class SpawnManager : MonoBehaviour
 			default:
 				break;
 		}
-		tankTeamComponent.Team = team;
-		tankComponent.TankDirection = team == Teams.TOP ? Directions.DOWN : Directions.UP;
 	}
 
 	/// <summary>

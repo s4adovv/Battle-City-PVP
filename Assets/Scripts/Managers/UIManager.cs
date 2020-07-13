@@ -7,8 +7,8 @@ using static Statics;
 
 public class UIManager : MonoBehaviour
 {
-	private const string TOP_PLAYER_WON_TEXT = "Поздравляем верхнего игрока с победой!";
-	private const string BOTTOM_PLAYER_WON_TEXT = "Поздравляем нижнего игрока с победой!";
+	private const string TOP_PLAYER_WON_CODE = "top_won_text";
+	private const string BOTTOM_PLAYER_WON_CODE = "bottom_won_text";
 
 	private const float SCORE_HIDE_DELAY = 2f;
 	private const float RESULT_SCREEN_DELAY = 5f;
@@ -41,7 +41,7 @@ public class UIManager : MonoBehaviour
 	public void SetTopPlayerColor(int color) { // Unity can't serialize enum in the UI events
 		SkinManager.playersSkin[(int)Teams.TOP] = (PlayerColors)color;
 		SkinManager.Instance.SetUITankParts(topTankBodyParts, (PlayerColors)color);
-		SkinManager.Instance.SetUIStar(tanksScoreStar[(int)Teams.BOTTOM], (PlayerColors)color);
+		SkinManager.Instance.SetUIStar(tanksScoreStar[(int)Teams.TOP], (PlayerColors)color);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -84,7 +84,7 @@ public class UIManager : MonoBehaviour
 	private IEnumerator GameOverRoutine(Teams wonTeam) {
 		StopCoroutine("AddScoreRoutine");
 
-		gameResultText.text = wonTeam == Teams.TOP ? TOP_PLAYER_WON_TEXT : BOTTOM_PLAYER_WON_TEXT;
+		gameResultText.text = wonTeam == Teams.TOP ? LocalizationManager.Instance.Localize(TOP_PLAYER_WON_CODE) : LocalizationManager.Instance.Localize(BOTTOM_PLAYER_WON_CODE);
 		gameResultText.gameObject.SetActive(true);
 		yield return new WaitForSeconds(RESULT_SCREEN_DELAY);
 		gameResultText.gameObject.SetActive(false);
