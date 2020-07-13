@@ -94,6 +94,7 @@
     <Compile Include="Assets\Scripts\EntityPool.cs" />
     <Compile Include="Assets\Scripts\IPool.cs" />
     <Compile Include="Assets\Scripts\Managers\AudioManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\LocalizationManager.cs" />
     <Compile Include="Assets\Scripts\Managers\MapManager.cs" />
     <Compile Include="Assets\Scripts\Managers\PlayManager.cs" />
     <Compile Include="Assets\Scripts\Managers\SkinManager.cs" />
@@ -107,10 +108,13 @@
     <Compile Include="Assets\Scripts\Statics.cs" />
     <None Include="Assets\ScriptTemplates\ECS__Globals__CustomVariable.cs.txt" />
     <None Include="Assets\ScriptTemplates\ECS__System.cs.txt" />
+    <None Include="Assets\Resources\Languages\Readme.txt" />
     <None Include="Assets\ScriptTemplates\ECS__Initializer.cs.txt" />
     <None Include="Assets\ScriptTemplates\ECS__LateSystem.cs.txt" />
     <None Include="Assets\Resources\Level maps(30x18)\2.txt" />
     <None Include="Assets\ScriptTemplates\ECS__Component.cs.txt" />
+    <None Include="Assets\Resources\Languages\en_US\en_US.txt" />
+    <None Include="Assets\Resources\Languages\ru_RU\ru_RU.txt" />
     <None Include="Assets\Resources\Level maps(30x18)\3.txt" />
     <None Include="Assets\Resources\Level maps(30x18)\Map readme.txt" />
     <None Include="Assets\Resources\Level maps(30x18)\0.txt" />
