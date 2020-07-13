@@ -1,0 +1,12 @@
+language_tag|ENG
+game_name|Battle City
+start_game_button|Play
+controls_text|Controls
+top_player_controls|Top tank|n|n(WASD + Space)
+bottom_player_controls|Bottom tank|n|n(Arrows + Right Ctrl)
+top_player_color|Top player tank color
+bottom_player_color|Bottom player tank color
+top_won_text|Congratulations to the top player!
+bottom_won_text|Congratulations to the bottom player!
+life_text|Players lives
+score_text|Players score

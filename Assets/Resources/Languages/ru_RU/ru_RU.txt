@@ -1,0 +1,12 @@
+language_tag|РУС
+game_name|Танчики
+start_game_button|Играть
+controls_text|Управление
+top_player_controls|Верхний игрок|n(WASD + Пробел)
+bottom_player_controls|Нижний игрок|n(Стрелки + Правый Ctrl)
+top_player_color|Цвет верхнего игрока
+bottom_player_color|Цвет нижнего игрока
+top_won_text|Поздравляем верхнего игрока с победой!
+bottom_won_text|Поздравляем нижнего игрока с победой!
+life_text|Жизни игроков
+score_text|Счет игроков
